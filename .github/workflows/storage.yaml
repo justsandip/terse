@@ -1,0 +1,26 @@
+name: storage
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    paths:
+      - "packages/storage/**"
+      - ".github/workflows/storage.yaml"
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "packages/storage/**"
+      - ".github/workflows/storage.yaml"
+    branches:
+      - main
+
+jobs:
+  build:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/dart_package.yml@v2
+    with:
+      dart_sdk: stable
+      working_directory: packages/storage
