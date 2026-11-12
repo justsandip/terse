@@ -1,0 +1,24 @@
+{
+  "name": "killtest",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "bun check",
+    "check": "bun src/check.ts",
+    "smoke": "bun src/smoke.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "csv-parse": "^7.0.3",
+    "dotenv": "^18.0.10",
+    "zod": "^4.6.7"
+  }
+}
