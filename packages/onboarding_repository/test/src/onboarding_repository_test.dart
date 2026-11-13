@@ -37,19 +37,24 @@ void main() {
         expect(await repository.fetchOnboardingCompleted(), isTrue);
       });
 
-      test('throws FetchOnboardingCompletedFailure when reading fails',
-          () async {
-        final exception = StorageReadException('oops', StackTrace.current);
-        when(() => storage.read(key: key)).thenThrow(exception);
+      test(
+        'throws FetchOnboardingCompletedFailure when reading fails',
+        () async {
+          final exception = StorageReadException('oops', StackTrace.current);
+          when(() => storage.read(key: key)).thenThrow(exception);
 
-        await expectLater(
-          repository.fetchOnboardingCompleted(),
-          throwsA(
-            isA<FetchOnboardingCompletedFailure>()
-                .having((f) => f.error, 'error', exception),
-          ),
-        );
-      });
+          await expectLater(
+            repository.fetchOnboardingCompleted(),
+            throwsA(
+              isA<FetchOnboardingCompletedFailure>().having(
+                (f) => f.error,
+                'error',
+                exception,
+              ),
+            ),
+          );
+        },
+      );
     });
 
     group('setOnboardingCompleted', () {
@@ -71,17 +76,18 @@ void main() {
         verify(() => storage.write(key: key, value: 'false')).called(1);
       });
 
-      test('throws SetOnboardingCompletedFailure when saving fails',
-          () async {
+      test('throws SetOnboardingCompletedFailure when saving fails', () async {
         final exception = StorageWriteException('oops', StackTrace.current);
-        when(() => storage.write(key: key, value: 'true'))
-            .thenThrow(exception);
+        when(() => storage.write(key: key, value: 'true')).thenThrow(exception);
 
         await expectLater(
           repository.setOnboardingCompleted(completed: true),
           throwsA(
-            isA<SetOnboardingCompletedFailure>()
-                .having((f) => f.error, 'error', exception),
+            isA<SetOnboardingCompletedFailure>().having(
+              (f) => f.error,
+              'error',
+              exception,
+            ),
           ),
         );
       });
