@@ -1,0 +1,26 @@
+name: shared_preferences_storage
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    paths:
+      - "packages/shared_preferences_storage/**"
+      - ".github/workflows/shared_preferences_storage.yaml"
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "packages/shared_preferences_storage/**"
+      - ".github/workflows/shared_preferences_storage.yaml"
+    branches:
+      - main
+
+jobs:
+  build:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
+    with:
+      flutter_version: "3.47.x"
+      working_directory: packages/shared_preferences_storage
