@@ -2,10 +2,10 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
 
-part 'onboarding_state.dart';
+part 'app_state.dart';
 
-class OnboardingCubit extends Cubit<OnboardingState> {
-  new({required this._onboardingRepository}) : super(const OnboardingState());
+class AppCubit extends Cubit<AppState> {
+  new({required this._onboardingRepository}) : super(const AppState());
 
   final OnboardingRepository _onboardingRepository;
 
@@ -13,25 +13,23 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     try {
       final completed = await _onboardingRepository.fetchOnboardingCompleted();
       emit(
-        OnboardingState(
-          status: completed
-              ? OnboardingStatus.complete
-              : OnboardingStatus.incomplete,
+        AppState(
+          status: completed ? AppStatus.ready : AppStatus.onboardingRequired,
         ),
       );
     } on OnboardingFailure catch (error, stackTrace) {
       addError(error, stackTrace);
-      emit(const OnboardingState(status: OnboardingStatus.failure));
+      emit(const AppState(status: AppStatus.failure));
     }
   }
 
   Future<void> completeOnboarding() async {
     try {
       await _onboardingRepository.setOnboardingCompleted(completed: true);
-      emit(const OnboardingState(status: OnboardingStatus.complete));
+      emit(const AppState(status: AppStatus.ready));
     } on OnboardingFailure catch (error, stackTrace) {
       addError(error, stackTrace);
-      emit(const OnboardingState(status: OnboardingStatus.failure));
+      emit(const AppState(status: AppStatus.failure));
     }
   }
 }
