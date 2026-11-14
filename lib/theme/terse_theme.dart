@@ -18,6 +18,8 @@ class TerseTheme {
       dividerTheme: _dividerTheme,
       cardTheme: _cardTheme,
       bottomSheetTheme: _bottomSheetTheme,
+      filledButtonTheme: _filledButtonTheme,
+      chipTheme: _chipTheme,
     );
   }
 
@@ -30,6 +32,10 @@ class TerseTheme {
       onPrimary: TerseColors.white,
       primaryContainer: TerseColors.peach,
       onPrimaryContainer: TerseColors.rust,
+      secondary: TerseColors.ember,
+      onSecondary: TerseColors.white,
+      secondaryContainer: TerseColors.peach,
+      onSecondaryContainer: TerseColors.rust,
       surface: TerseColors.paper,
       onSurface: TerseColors.ink,
       onSurfaceVariant: TerseColors.stone,
@@ -87,6 +93,38 @@ class TerseTheme {
       showDragHandle: true,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+    );
+  }
+
+  FilledButtonThemeData get _filledButtonTheme {
+    return FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        backgroundColor: TerseColors.ember,
+        foregroundColor: TerseColors.white,
+        disabledBackgroundColor: TerseColors.pebble,
+        disabledForegroundColor: TerseColors.stone,
+        minimumSize: const Size(64, 56),
+        shape: const StadiumBorder(),
+        textStyle: TerseTextStyles.mobile.labelLarge,
+      ),
+    );
+  }
+
+  ChipThemeData get _chipTheme {
+    return ChipThemeData(
+      side: const BorderSide(color: TerseColors.sand),
+      shape: const StadiumBorder(),
+      labelStyle: TerseTextStyles.mobile.labelMedium.copyWith(
+        color: WidgetStateColor.resolveWith((states) {
+          if (states.contains(WidgetState.disabled)) {
+            return TerseColors.stone.withValues(alpha: 0.5);
+          }
+          if (states.contains(WidgetState.selected)) {
+            return TerseColors.rust;
+          }
+          return TerseColors.charcoal;
+        }),
       ),
     );
   }
