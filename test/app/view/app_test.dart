@@ -3,10 +3,11 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
 import 'package:terse/app/app.dart';
-import 'package:terse/counter/counter.dart';
+import 'package:terse/capture/capture.dart';
 
 class _MockOnboardingRepository extends Mock implements OnboardingRepository;
 
@@ -31,9 +32,17 @@ void main() {
   });
 
   group('AppView', () {
-    testWidgets('renders CounterPage', (tester) async {
+    testWidgets('renders CapturePage', (tester) async {
       await tester.pumpWidget(AppView());
-      expect(find.byType(CounterPage), findsOneWidget);
+      expect(find.byType(CapturePage), findsOneWidget);
+    });
+
+    testWidgets('disposes without errors', (tester) async {
+      await tester.pumpWidget(AppView());
+      await tester.pumpAndSettle();
+
+      await tester.pumpWidget(const SizedBox());
+      expect(tester.takeException(), isNull);
     });
   });
 }
