@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
 import 'package:terse/counter/counter.dart';
 import 'package:terse/l10n/l10n.dart';
+import 'package:terse/theme/theme.dart';
 
 class App extends StatelessWidget {
   const new({required this._onboardingRepository, super.key});
@@ -24,12 +25,7 @@ class AppView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        ),
-        useMaterial3: true,
-      ),
+      theme: const TerseTheme().themeData,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: const CounterPage(),
