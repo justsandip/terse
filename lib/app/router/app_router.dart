@@ -1,40 +1,70 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'package:terse/app/app.dart';
+import 'package:terse/app/router/app_route.dart';
 import 'package:terse/capture/capture.dart';
 import 'package:terse/setup/setup.dart';
-
-/// Names of the app's routes
-abstract class RouteNames {
-  /// The capture screen.
-  static const capture = 'capture';
-
-  /// The setup screen.
-  static const setup = 'setup';
-}
+import 'package:terse/splash/splash.dart';
 
 /// {@template app_router}
 /// Owns the app's [GoRouter] and the route tree.
 /// {@endtemplate}
 class AppRouter {
   /// {@macro app_router}
-  new()
-    : router = GoRouter(
-        routes: [
-          GoRoute(
-            name: RouteNames.capture,
-            path: '/',
-            builder: (context, state) => const CapturePage(),
-          ),
-          GoRoute(
-            name: RouteNames.setup,
-            path: '/setup',
-            builder: (context, state) => const SetupPage(),
-          ),
-        ],
-      );
+  new({required this._appCubit})
+    : _refresh = _StreamListenable(_appCubit.stream) {
+    router = GoRouter(
+      initialLocation: AppRoute.splash.path,
+      refreshListenable: _refresh,
+      redirect: (context, state) => _redirect(state),
+      routes: [
+        AppRoute.splash.route(builder: (_, _) => const SplashPage()),
+        AppRoute.capture.route(builder: (_, _) => const CapturePage()),
+        AppRoute.setup.route(builder: (_, _) => const SetupPage()),
+      ],
+    );
+  }
+
+  final AppCubit _appCubit;
+  final _StreamListenable _refresh;
 
   /// The router to hand to `MaterialApp.router`.
-  final GoRouter router;
+  late final GoRouter router;
 
-  /// Releases the resources held by [router].
-  void dispose() => router.dispose();
+  String? _redirect(GoRouterState state) {
+    return switch (_appCubit.state.status) {
+      AppStatus.unknown =>
+        AppRoute.splash.isAt(state) ? null : AppRoute.splash.path,
+      AppStatus.onboardingRequired || AppStatus.failure =>
+        AppRoute.setup.isAt(state) ? null : AppRoute.setup.path,
+      AppStatus.ready =>
+        AppRoute.splash.isAt(state) || AppRoute.setup.isAt(state)
+            ? AppRoute.capture.path
+            : null,
+    };
+  }
+
+  /// Releases the resources held by the router.
+  void dispose() {
+    router.dispose();
+    _refresh.dispose();
+  }
+}
+
+/// Notifies its listeners every time stream emits, so the router
+/// re-evaluates its redirect.
+class _StreamListenable extends ChangeNotifier {
+  new(Stream<Object?> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<Object?> _subscription;
+
+  @override
+  void dispose() {
+    unawaited(_subscription.cancel());
+    super.dispose();
+  }
 }

@@ -2,54 +2,50 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
-import 'package:terse/onboarding/onboarding.dart';
+import 'package:terse/app/app.dart';
 
 class _MockOnboardingRepository extends Mock implements OnboardingRepository;
 
 void main() {
-  group('OnboardingCubit', () {
+  group('AppCubit', () {
     late OnboardingRepository onboardingRepository;
 
     setUp(() {
       onboardingRepository = _MockOnboardingRepository();
     });
 
-    OnboardingCubit buildCubit() {
-      return OnboardingCubit(onboardingRepository: onboardingRepository);
+    AppCubit buildCubit() {
+      return AppCubit(onboardingRepository: onboardingRepository);
     }
 
     test('initial state is unknown', () {
-      expect(buildCubit().state, equals(const OnboardingState()));
+      expect(buildCubit().state, equals(const AppState()));
     });
 
     group('fetchOnboardingCompleted', () {
-      blocTest<OnboardingCubit, OnboardingState>(
-        'emits complete when onboarding is completed',
+      blocTest<AppCubit, AppState>(
+        'emits ready when onboarding is completed',
         setUp: () {
           when(() => onboardingRepository.fetchOnboardingCompleted())
               .thenAnswer((_) async => true);
         },
         build: buildCubit,
         act: (cubit) => cubit.fetchOnboardingCompleted(),
-        expect: () => [
-          const OnboardingState(status: OnboardingStatus.complete),
-        ],
+        expect: () => [const AppState(status: AppStatus.ready)],
       );
 
-      blocTest<OnboardingCubit, OnboardingState>(
-        'emits incomplete when onboarding is not completed',
+      blocTest<AppCubit, AppState>(
+        'emits onboardingRequired when onboarding is not completed',
         setUp: () {
           when(() => onboardingRepository.fetchOnboardingCompleted())
               .thenAnswer((_) async => false);
         },
         build: buildCubit,
         act: (cubit) => cubit.fetchOnboardingCompleted(),
-        expect: () => [
-          const OnboardingState(status: OnboardingStatus.incomplete),
-        ],
+        expect: () => [const AppState(status: AppStatus.onboardingRequired)],
       );
 
-      blocTest<OnboardingCubit, OnboardingState>(
+      blocTest<AppCubit, AppState>(
         'emits failure and reports the error when fetching fails',
         setUp: () {
           when(() => onboardingRepository.fetchOnboardingCompleted())
@@ -57,14 +53,14 @@ void main() {
         },
         build: buildCubit,
         act: (cubit) => cubit.fetchOnboardingCompleted(),
-        expect: () => [const OnboardingState(status: OnboardingStatus.failure)],
+        expect: () => [const AppState(status: AppStatus.failure)],
         errors: () => [isA<FetchOnboardingCompletedFailure>()],
       );
     });
 
     group('completeOnboarding', () {
-      blocTest<OnboardingCubit, OnboardingState>(
-        'saves the status and emits complete',
+      blocTest<AppCubit, AppState>(
+        'saves the status and emits ready',
         setUp: () {
           when(
             () => onboardingRepository.setOnboardingCompleted(
@@ -74,9 +70,7 @@ void main() {
         },
         build: buildCubit,
         act: (cubit) => cubit.completeOnboarding(),
-        expect: () => [
-          const OnboardingState(status: OnboardingStatus.complete),
-        ],
+        expect: () => [const AppState(status: AppStatus.ready)],
         verify: (_) {
           verify(
             () => onboardingRepository.setOnboardingCompleted(completed: true),
@@ -84,7 +78,7 @@ void main() {
         },
       );
 
-      blocTest<OnboardingCubit, OnboardingState>(
+      blocTest<AppCubit, AppState>(
         'emits failure and reports the error when saving fails',
         setUp: () {
           when(
@@ -95,7 +89,7 @@ void main() {
         },
         build: buildCubit,
         act: (cubit) => cubit.completeOnboarding(),
-        expect: () => [const OnboardingState(status: OnboardingStatus.failure)],
+        expect: () => [const AppState(status: AppStatus.failure)],
         errors: () => [isA<SetOnboardingCompletedFailure>()],
       );
     });
