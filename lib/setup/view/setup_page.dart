@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:terse/l10n/l10n.dart';
 
 /// Placeholder for the setup screen, replaced when the screen is built.
 class SetupPage extends StatelessWidget {
@@ -6,6 +7,7 @@ class SetupPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Setup')));
+    final l10n = context.l10n;
+    return Scaffold(body: Center(child: Text(l10n.setupAppBarTitle)));
   }
 }

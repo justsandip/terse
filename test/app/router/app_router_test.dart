@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:terse/app/router/router.dart';
 import 'package:terse/capture/capture.dart';
+import 'package:terse/l10n/l10n.dart';
 import 'package:terse/setup/setup.dart';
 
 void main() {
@@ -18,23 +19,25 @@ void main() {
 
     Future<void> pumpRouter(WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp.router(routerConfig: appRouter.router),
+        MaterialApp.router(
+          routerConfig: appRouter.router,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+        ),
       );
       await tester.pumpAndSettle();
     }
 
     testWidgets('starts on CapturePage', (tester) async {
       await pumpRouter(tester);
-
       expect(find.byType(CapturePage), findsOneWidget);
     });
 
     testWidgets('navigates to SetupPage by name', (tester) async {
       await pumpRouter(tester);
-
       appRouter.router.goNamed(RouteNames.setup);
-      await tester.pumpAndSettle();
 
+      await tester.pumpAndSettle();
       expect(find.byType(SetupPage), findsOneWidget);
     });
 
