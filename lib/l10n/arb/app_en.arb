@@ -1,11 +1,84 @@
 {
-    "@@locale": "en",
-    "captureAppBarTitle": "Capture",
-    "@captureAppBarTitle": {
-        "description": "Text shown in the AppBar of the Capture Page"
-    },
-    "setupAppBarTitle": "Setup",
-    "@setupAppBarTitle": {
-        "description": "Text shown in the AppBar of the Setup Page"
+  "@@locale": "en",
+  "captureAppBarTitle": "Capture",
+  "@captureAppBarTitle": {
+    "description": "Text shown in the AppBar of the Capture Page"
+  },
+  "setupTitle": "What to track?",
+  "@setupTitle": {
+    "description": "Title of the setup screen"
+  },
+  "setupSubtitle": "Pick up to {max} metrics. You can change them later.",
+  "@setupSubtitle": {
+    "description": "Subtitle of the setup screen",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
     }
+  },
+  "setupTemplatesLabel": "Start from a template",
+  "@setupTemplatesLabel": {
+    "description": "Label above the template chips on the setup screen"
+  },
+  "setupTemplateSleep": "Sleep",
+  "@setupTemplateSleep": {
+    "description": "Name of the sleep template"
+  },
+  "setupTemplateMood": "Mood",
+  "@setupTemplateMood": {
+    "description": "Name of the mood template"
+  },
+  "setupTemplateFitness": "Fitness",
+  "@setupTemplateFitness": {
+    "description": "Name of the fitness template"
+  },
+  "setupMetricsLabel": "Your metrics",
+  "@setupMetricsLabel": {
+    "description": "Label above the metric chips on the setup screen"
+  },
+  "setupMetricsCount": "{selected} of {max}",
+  "@setupMetricsCount": {
+    "description": "How many metrics are selected out of the maximum",
+    "placeholders": {
+      "selected": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "setupStartTracking": "Start tracking",
+  "@setupStartTracking": {
+    "description": "Label of the button that finishes setup"
+  },
+  "metricSleepHours": "Sleep hours",
+  "@metricSleepHours": {
+    "description": "Name of the sleep hours metric"
+  },
+  "metricSleepQuality": "Sleep quality",
+  "@metricSleepQuality": {
+    "description": "Name of the sleep quality metric"
+  },
+  "metricMood": "Mood",
+  "@metricMood": {
+    "description": "Name of the mood metric"
+  },
+  "metricEnergy": "Energy",
+  "@metricEnergy": {
+    "description": "Name of the energy metric"
+  },
+  "metricStress": "Stress",
+  "@metricStress": {
+    "description": "Name of the stress metric"
+  },
+  "metricCaffeine": "Caffeine",
+  "@metricCaffeine": {
+    "description": "Name of the caffeine metric"
+  },
+  "metricExercise": "Exercise",
+  "@metricExercise": {
+    "description": "Name of the exercise metric"
+  }
 }
