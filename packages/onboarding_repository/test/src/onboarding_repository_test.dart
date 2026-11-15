@@ -1,19 +1,19 @@
+import 'package:key_value_storage/key_value_storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
-import 'package:storage/storage.dart';
 import 'package:test/test.dart';
 
-class _MockStorage extends Mock implements Storage;
+class _MockKeyValueStorage extends Mock implements KeyValueStorage;
 
 void main() {
   group(OnboardingRepository, () {
     const key = OnboardingRepository.completedKey;
 
-    late Storage storage;
+    late KeyValueStorage storage;
     late OnboardingRepository repository;
 
     setUp(() {
-      storage = _MockStorage();
+      storage = _MockKeyValueStorage();
       repository = OnboardingRepository(storage: storage);
     });
 

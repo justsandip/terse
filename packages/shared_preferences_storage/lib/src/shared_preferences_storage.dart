@@ -1,12 +1,12 @@
+import 'package:key_value_storage/key_value_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:storage/storage.dart';
 
 /// {@template shared_preferences_storage}
-/// A [Storage] backed by [SharedPreferencesAsync].
+/// A [KeyValueStorage] backed by [SharedPreferencesAsync].
 ///
 /// Suited to small values such as flags and settings.
 /// {@endtemplate}
-class SharedPreferencesStorage implements Storage {
+class SharedPreferencesStorage implements KeyValueStorage {
   /// {@macro shared_preferences_storage}
   const new({required this._sharedPreferences});
 

@@ -1,5 +1,5 @@
 /// A Key/Value Storage Contract
 library;
 
-export 'src/storage.dart';
+export 'src/key_value_storage.dart';
 export 'src/storage_exception.dart';

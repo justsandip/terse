@@ -7,8 +7,8 @@ environment:
   sdk: ^3.13.0
 
 dependencies:
-  storage:
-    path: ../storage
+  key_value_storage:
+    path: ../key_value_storage
 
 dev_dependencies:
   coverage: ^1.16.0

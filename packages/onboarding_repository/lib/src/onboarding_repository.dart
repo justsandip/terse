@@ -1,5 +1,5 @@
+import 'package:key_value_storage/key_value_storage.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
-import 'package:storage/storage.dart';
 
 /// {@template onboarding_repository}
 /// Repository to manage User Onboarding
@@ -11,7 +11,7 @@ class OnboardingRepository {
   /// The storage key that holds the onboarding status.
   static const completedKey = '__onboarding_completed_key__';
 
-  final Storage _storage;
+  final KeyValueStorage _storage;
 
   /// Returns whether the user has completed onboarding.
   ///

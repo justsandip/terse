@@ -1,4 +1,4 @@
-name: storage
+name: key_value_storage
 description: A Key/Value Storage Contract
 version: 0.1.0+1
 publish_to: none
