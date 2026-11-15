@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:key_value_storage/key_value_storage.dart';
 import 'package:metrics_repository/metrics_repository.dart';
-import 'package:storage/storage.dart';
 
 /// {@template metrics_repository}
 /// Stores the metrics a user chose to track.
@@ -13,7 +13,7 @@ class MetricsRepository {
   /// The storage key that holds the chosen metrics.
   static const metricsKey = '__metrics_key__';
 
-  final Storage _storage;
+  final KeyValueStorage _storage;
 
   /// Returns the metrics the user chose, or an empty list if none were saved.
   ///

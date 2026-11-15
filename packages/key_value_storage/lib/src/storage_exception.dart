@@ -1,7 +1,7 @@
-import 'package:storage/storage.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 
 /// {@template storage_exception}
-/// Base class for failures thrown by a [Storage] implementation.
+/// Base class for failures thrown by a [KeyValueStorage] implementation.
 /// {@endtemplate}
 abstract class StorageException implements Exception {
   /// {@macro storage_exception}

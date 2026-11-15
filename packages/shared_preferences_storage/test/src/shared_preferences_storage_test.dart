@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_storage/shared_preferences_storage.dart';
-import 'package:storage/storage.dart';
 
 class _MockSharedPreferencesAsync extends Mock
     implements SharedPreferencesAsync;
@@ -21,8 +21,8 @@ void main() {
       storage = SharedPreferencesStorage(sharedPreferences: sharedPreferences);
     });
 
-    test('is a Storage', () {
-      expect(storage, isA<Storage>());
+    test('is a KeyValueStorage', () {
+      expect(storage, isA<KeyValueStorage>());
     });
 
     group('read', () {

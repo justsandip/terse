@@ -1,4 +1,4 @@
-import 'package:storage/storage.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 import 'package:test/test.dart';
 
 typedef ExceptionFactory = StorageException Function(Object, StackTrace);

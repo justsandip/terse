@@ -1,12 +1,10 @@
-import 'package:storage/storage.dart';
+import 'package:key_value_storage/key_value_storage.dart';
 
-/// {@template storage}
 /// A key-value storage contract.
 ///
 /// Implementations decide where values live, for example on the device, in a
 /// secure store, or in a remote database.
-/// {@endtemplate}
-abstract interface class Storage {
+abstract interface class KeyValueStorage {
   /// Returns the value stored under [key], or `null` if there is none.
   ///
   /// Throws a [StorageReadException] if the read fails.

@@ -1,21 +1,21 @@
 import 'dart:convert';
 
+import 'package:key_value_storage/key_value_storage.dart';
 import 'package:metrics_repository/metrics_repository.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:storage/storage.dart';
 import 'package:test/test.dart';
 
-class _MockStorage extends Mock implements Storage;
+class _MockKeyValueStorage extends Mock implements KeyValueStorage;
 
 void main() {
   group(MetricsRepository, () {
     const key = MetricsRepository.metricsKey;
 
-    late Storage storage;
+    late KeyValueStorage storage;
     late MetricsRepository repository;
 
     setUp(() {
-      storage = _MockStorage();
+      storage = _MockKeyValueStorage();
       repository = MetricsRepository(storage: storage);
     });
 

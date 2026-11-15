@@ -1,4 +1,4 @@
-name: storage
+name: key_value_storage
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -7,14 +7,14 @@ concurrency:
 on:
   push:
     paths:
-      - "packages/storage/**"
-      - ".github/workflows/storage.yaml"
+      - "packages/key_value_storage/**"
+      - ".github/workflows/key_value_storage.yaml"
     branches:
       - main
   pull_request:
     paths:
-      - "packages/storage/**"
-      - ".github/workflows/storage.yaml"
+      - "packages/key_value_storage/**"
+      - ".github/workflows/key_value_storage.yaml"
     branches:
       - main
 
@@ -23,4 +23,4 @@ jobs:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/dart_package.yml@v2
     with:
       dart_sdk: stable
-      working_directory: packages/storage
+      working_directory: packages/key_value_storage
