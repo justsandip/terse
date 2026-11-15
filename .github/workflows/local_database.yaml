@@ -1,0 +1,27 @@
+name: local_database
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    paths:
+      - "packages/local_database/**"
+      - ".github/workflows/local_database.yaml"
+    branches:
+      - main
+  pull_request:
+    paths:
+      - "packages/local_database/**"
+      - ".github/workflows/local_database.yaml"
+    branches:
+      - main
+
+jobs:
+  build:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/dart_package.yml@v2
+    with:
+      dart_sdk: stable
+      working_directory: packages/local_database
+      coverage_excludes: "**/*.g.dart **/tables.dart"
