@@ -39,10 +39,10 @@ class MetricDefinition extends Equatable {
   final String? unit;
 
   /// The lowest allowed value of a number or a scale.
-  final num? min;
+  final double? min;
 
   /// The highest allowed value of a number or a scale.
-  final num? max;
+  final double? max;
 
   /// The allowed options of a choice.
   @JsonKey(toJson: _choicesToJson)

@@ -307,10 +307,11 @@ class $MetricsTable extends Metrics with TableInfo<$MetricsTable, MetricRow> {
 }
 
 class MetricRow extends DataClass implements Insertable<MetricRow> {
-  /// The unique id of the metric, a UUID.
+  /// The unique id of the metric: the key for a built-in metric, a UUID for
+  /// any other.
   final String id;
 
-  /// A stable identifier, e.g. `sleep_hours`. No two metrics share one.
+  /// A stable unique identifier, e.g. `sleep_hours`.
   final String key;
 
   /// The kind of value the metric holds, as plain text.

@@ -1,63 +1,107 @@
 import 'dart:convert';
 
-import 'package:key_value_storage/key_value_storage.dart';
+import 'package:local_database/local_database.dart';
 import 'package:metrics_repository/metrics_repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
-class _MockKeyValueStorage extends Mock implements KeyValueStorage;
+class _MockLocalDatabase extends Mock implements LocalDatabase;
 
 void main() {
-  group(MetricsRepository, () {
-    const key = MetricsRepository.metricsKey;
+  final now = DateTime.utc(2026, 11, 15, 12);
+  final earlier = DateTime.utc(2026, 11);
 
-    late KeyValueStorage storage;
+  MetricRow row({
+    required String key,
+    String kind = 'scale',
+    String? unit,
+    double? minValue = 1,
+    double? maxValue = 5,
+    String? choices,
+    int position = 0,
+    DateTime? archivedAt,
+    DateTime? deletedAt,
+  }) {
+    return MetricRow(
+      id: key,
+      key: key,
+      kind: kind,
+      unit: unit,
+      minValue: minValue,
+      maxValue: maxValue,
+      choices: choices,
+      position: position,
+      archivedAt: archivedAt,
+      createdAt: earlier,
+      updatedAt: earlier,
+      deletedAt: deletedAt,
+    );
+  }
+
+  group(MetricsRepository, () {
+    late LocalDatabase database;
     late MetricsRepository repository;
 
-    setUp(() {
-      storage = _MockKeyValueStorage();
-      repository = MetricsRepository(storage: storage);
+    setUpAll(() {
+      registerFallbackValue(<MetricRow>[]);
     });
 
-    group('fetchMetrics', () {
-      test('returns an empty list when nothing is stored', () async {
-        when(() => storage.read(key: key)).thenAnswer((_) async => null);
+    setUp(() {
+      database = _MockLocalDatabase();
+      repository = MetricsRepository(database: database, now: () => now);
+      when(() => database.fetchMetrics()).thenAnswer((_) async => []);
+      when(() => database.fetchAllMetrics()).thenAnswer((_) async => []);
+      when(() => database.upsertMetrics(any())).thenAnswer((_) async {});
+    });
 
+    List<MetricRow> savedRows() {
+      final captured = verify(() => database.upsertMetrics(captureAny()))
+          .captured;
+      return captured.single as List<MetricRow>;
+    }
+
+    group('fetchMetrics', () {
+      test('returns an empty list when nothing is saved', () async {
         expect(await repository.fetchMetrics(), isEmpty);
-        verify(() => storage.read(key: key)).called(1);
       });
 
-      test('returns the stored metrics', () async {
-        final stored = jsonEncode([
-          MetricCatalog.sleepHours.toJson(),
-          MetricCatalog.mood.toJson(),
-        ]);
-        when(() => storage.read(key: key)).thenAnswer((_) async => stored);
+      test('maps the rows to metric definitions', () async {
+        when(() => database.fetchMetrics()).thenAnswer(
+          (_) async => [
+            row(
+              key: 'sleep_hours',
+              kind: 'number',
+              unit: 'hours',
+              minValue: 0,
+              maxValue: 16,
+            ),
+            row(key: 'mood'),
+            row(
+              key: 'exercise_type',
+              kind: 'choice',
+              minValue: null,
+              maxValue: null,
+              choices: jsonEncode(['none', 'walk']),
+            ),
+          ],
+        );
 
         expect(
           await repository.fetchMetrics(),
-          equals([MetricCatalog.sleepHours, MetricCatalog.mood]),
-        );
-      });
-
-      test('throws FetchMetricsFailure when reading fails', () async {
-        final exception = StorageReadException('oops', StackTrace.current);
-        when(() => storage.read(key: key)).thenThrow(exception);
-
-        await expectLater(
-          repository.fetchMetrics(),
-          throwsA(
-            isA<FetchMetricsFailure>().having(
-              (failure) => failure.error,
-              'error',
-              exception,
+          equals([
+            MetricCatalog.sleepHours,
+            MetricCatalog.mood,
+            const MetricDefinition(
+              key: 'exercise_type',
+              kind: MetricKind.choice,
+              choices: ['none', 'walk'],
             ),
-          ),
+          ]),
         );
       });
 
-      test('throws FetchMetricsFailure when the value is not JSON', () async {
-        when(() => storage.read(key: key)).thenAnswer((_) async => 'oops');
+      test('throws FetchMetricsFailure when the database fails', () async {
+        when(() => database.fetchMetrics()).thenThrow(Exception('oops'));
 
         await expectLater(
           repository.fetchMetrics(),
@@ -65,11 +109,19 @@ void main() {
         );
       });
 
-      test('throws FetchMetricsFailure when a metric is malformed', () async {
-        final stored = jsonEncode([
-          {'key': 'x', 'kind': 'nope'},
-        ]);
-        when(() => storage.read(key: key)).thenAnswer((_) async => stored);
+      test('throws FetchMetricsFailure for an unknown stored kind', () async {
+        when(() => database.fetchMetrics())
+            .thenAnswer((_) async => [row(key: 'x', kind: 'nope')]);
+
+        await expectLater(
+          repository.fetchMetrics(),
+          throwsA(isA<FetchMetricsFailure>()),
+        );
+      });
+
+      test('throws FetchMetricsFailure for invalid stored choices', () async {
+        when(() => database.fetchMetrics())
+            .thenAnswer((_) async => [row(key: 'x', choices: 'oops')]);
 
         await expectLater(
           repository.fetchMetrics(),
@@ -79,34 +131,122 @@ void main() {
     });
 
     group('saveMetrics', () {
-      test('stores the metrics as JSON', () async {
-        final expected = jsonEncode([MetricCatalog.mood.toJson()]);
-        when(() => storage.write(key: key, value: expected))
-            .thenAnswer((_) async {});
+      test('writes the chosen metrics in order', () async {
+        await repository.saveMetrics([
+          MetricCatalog.energy,
+          MetricCatalog.sleepHours,
+          MetricCatalog.exerciseType,
+        ]);
+
+        final rows = savedRows();
+        final energy = rows[0];
+        final sleepHours = rows[1];
+        final exerciseType = rows[2];
+
+        expect(
+          rows.map((r) => r.id),
+          equals(['energy', 'sleep_hours', 'exercise_type']),
+        );
+        expect(rows.map((r) => r.position), equals([0, 1, 2]));
+        expect(energy.kind, equals('scale'));
+        expect(energy.unit, isNull);
+        expect(energy.minValue, equals(1));
+        expect(energy.maxValue, equals(5));
+        expect(energy.choices, isNull);
+        expect(sleepHours.kind, equals('number'));
+        expect(sleepHours.unit, equals('hours'));
+        expect(sleepHours.maxValue, equals(16));
+        expect(exerciseType.kind, equals('choice'));
+        expect(
+          exerciseType.choices,
+          equals(jsonEncode(MetricCatalog.exerciseType.choices)),
+        );
+      });
+
+      test('stamps new metrics with the current time', () async {
+        await repository.saveMetrics([MetricCatalog.mood]);
+
+        final saved = savedRows().single;
+
+        expect(saved.createdAt, equals(now));
+        expect(saved.updatedAt, equals(now));
+        expect(saved.archivedAt, isNull);
+        expect(saved.deletedAt, isNull);
+      });
+
+      test('keeps the creation time of a metric that already exists', () async {
+        when(() => database.fetchAllMetrics())
+            .thenAnswer((_) async => [row(key: 'mood')]);
 
         await repository.saveMetrics([MetricCatalog.mood]);
 
-        verify(() => storage.write(key: key, value: expected)).called(1);
+        final saved = savedRows().single;
+
+        expect(saved.createdAt, equals(earlier));
+        expect(saved.updatedAt, equals(now));
       });
 
-      test('throws SaveMetricsFailure when writing fails', () async {
-        final exception = StorageWriteException('oops', StackTrace.current);
-        when(
-          () => storage.write(
-            key: key,
-            value: any(named: 'value'),
-          ),
-        ).thenThrow(exception);
+      test('brings back an archived metric', () async {
+        when(() => database.fetchAllMetrics())
+            .thenAnswer((_) async => [row(key: 'mood', archivedAt: earlier)]);
+
+        await repository.saveMetrics([MetricCatalog.mood]);
+
+        expect(savedRows().single.archivedAt, isNull);
+      });
+
+      test('archives a metric that is no longer chosen', () async {
+        when(() => database.fetchAllMetrics()).thenAnswer(
+          (_) async => [row(key: 'mood', position: 3), row(key: 'energy')],
+        );
+
+        await repository.saveMetrics([MetricCatalog.energy]);
+
+        final rows = savedRows();
+        final mood = rows.singleWhere((r) => r.key == 'mood');
+
+        expect(rows, hasLength(2));
+        expect(mood.archivedAt, equals(now));
+        expect(mood.updatedAt, equals(now));
+        expect(mood.createdAt, equals(earlier));
+        expect(mood.position, equals(3));
+      });
+
+      test('leaves archived and deleted metrics alone', () async {
+        when(() => database.fetchAllMetrics()).thenAnswer(
+          (_) async => [
+            row(key: 'mood', archivedAt: earlier),
+            row(key: 'stress', deletedAt: earlier),
+          ],
+        );
+
+        await repository.saveMetrics([]);
+
+        expect(savedRows(), isEmpty);
+      });
+
+      test('uses the current UTC time by default', () async {
+        await MetricsRepository(database: database)
+            .saveMetrics([MetricCatalog.mood]);
+
+        expect(savedRows().single.updatedAt.isUtc, isTrue);
+      });
+
+      test('throws SaveMetricsFailure when reading metrics fails', () async {
+        when(() => database.fetchAllMetrics()).thenThrow(Exception('oops'));
 
         await expectLater(
           repository.saveMetrics([MetricCatalog.mood]),
-          throwsA(
-            isA<SaveMetricsFailure>().having(
-              (failure) => failure.error,
-              'error',
-              exception,
-            ),
-          ),
+          throwsA(isA<SaveMetricsFailure>()),
+        );
+      });
+
+      test('throws SaveMetricsFailure when writing fails', () async {
+        when(() => database.upsertMetrics(any())).thenThrow(Exception('oops'));
+
+        await expectLater(
+          repository.saveMetrics([MetricCatalog.mood]),
+          throwsA(isA<SaveMetricsFailure>()),
         );
       });
     });

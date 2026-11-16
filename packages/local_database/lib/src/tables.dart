@@ -7,7 +7,8 @@ import 'package:drift/drift.dart';
 /// The metrics a user tracks.
 @DataClassName('MetricRow')
 class Metrics extends Table {
-  /// The unique id of the metric, a UUID.
+  /// The unique id of the metric: the key for a built-in metric, a UUID for
+  /// any other.
   TextColumn get id => text()();
 
   /// A stable unique identifier, e.g. `sleep_hours`.

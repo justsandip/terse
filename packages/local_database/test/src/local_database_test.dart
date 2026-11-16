@@ -76,6 +76,23 @@ void main() {
       });
     });
 
+    group('fetchAllMetrics', () {
+      test('returns every metric, archived and deleted ones too', () async {
+        await database.upsertMetrics([
+          metric(id: 'a', key: 'mood'),
+          metric(id: 'b', key: 'energy', archivedAt: now),
+          metric(id: 'c', key: 'stress', deletedAt: now),
+        ]);
+
+        final rows = await database.fetchAllMetrics();
+
+        expect(
+          rows.map((row) => row.key),
+          unorderedEquals(['mood', 'energy', 'stress']),
+        );
+      });
+    });
+
     group('upsertMetrics', () {
       test('updates a metric that already exists', () async {
         await database.upsertMetrics([metric(id: 'a', key: 'mood')]);
