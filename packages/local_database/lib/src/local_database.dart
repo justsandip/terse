@@ -25,6 +25,9 @@ class LocalDatabase extends _$LocalDatabase {
     return query.get();
   }
 
+  /// Returns every metric, including the archived and the deleted ones.
+  Future<List<MetricRow>> fetchAllMetrics() => select(metrics).get();
+
   /// Inserts [rows], or updates the rows that already exist.
   Future<void> upsertMetrics(List<MetricRow> rows) {
     return batch((batch) => batch.insertAllOnConflictUpdate(metrics, rows));

@@ -11,8 +11,8 @@ MetricDefinition _$MetricDefinitionFromJson(Map<String, dynamic> json) =>
       key: json['key'] as String,
       kind: $enumDecode(_$MetricKindEnumMap, json['kind']),
       unit: json['unit'] as String?,
-      min: json['min'] as num?,
-      max: json['max'] as num?,
+      min: (json['min'] as num?)?.toDouble(),
+      max: (json['max'] as num?)?.toDouble(),
       choices:
           (json['choices'] as List<dynamic>?)
               ?.map((e) => e as String)
