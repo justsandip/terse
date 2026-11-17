@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:metrics_repository/metrics_repository.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
 import 'package:terse/app/app.dart';
 import 'package:terse/app/router/router.dart';
@@ -9,14 +10,22 @@ import 'package:terse/l10n/l10n.dart';
 import 'package:terse/theme/theme.dart';
 
 class App extends StatelessWidget {
-  const new({required this._onboardingRepository, super.key});
+  const new({
+    required this._onboardingRepository,
+    required this._metricsRepository,
+    super.key,
+  });
 
   final OnboardingRepository _onboardingRepository;
+  final MetricsRepository _metricsRepository;
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
-      providers: [RepositoryProvider.value(value: _onboardingRepository)],
+      providers: [
+        RepositoryProvider.value(value: _onboardingRepository),
+        RepositoryProvider.value(value: _metricsRepository),
+      ],
       child: BlocProvider<AppCubit>(
         create: (context) {
           final cubit = AppCubit(

@@ -5,6 +5,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:metrics_repository/metrics_repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
 import 'package:terse/app/app.dart';
@@ -13,11 +14,14 @@ import 'package:terse/setup/setup.dart';
 
 class _MockOnboardingRepository extends Mock implements OnboardingRepository;
 
+class _MockMetricsRepository extends Mock implements MetricsRepository;
+
 class _MockAppCubit extends MockCubit<AppState> implements AppCubit;
 
 void main() {
   group('App', () {
     late OnboardingRepository onboardingRepository;
+    late MetricsRepository metricsRepository;
 
     void stubStatus({required bool completed}) {
       when(() => onboardingRepository.fetchOnboardingCompleted())
@@ -26,22 +30,38 @@ void main() {
 
     setUp(() {
       onboardingRepository = _MockOnboardingRepository();
+      metricsRepository = _MockMetricsRepository();
       stubStatus(completed: true);
     });
 
     testWidgets('renders AppView', (tester) async {
-      await tester.pumpWidget(App(onboardingRepository: onboardingRepository));
+      await tester.pumpWidget(
+        App(
+          onboardingRepository: onboardingRepository,
+          metricsRepository: metricsRepository,
+        ),
+      );
       expect(find.byType(AppView), findsOneWidget);
     });
 
     testWidgets('provides the OnboardingRepository', (tester) async {
-      await tester.pumpWidget(App(onboardingRepository: onboardingRepository));
+      await tester.pumpWidget(
+        App(
+          onboardingRepository: onboardingRepository,
+          metricsRepository: metricsRepository,
+        ),
+      );
       final context = tester.element(find.byType(AppView));
       expect(context.read<OnboardingRepository>(), same(onboardingRepository));
     });
 
     testWidgets('provides an AppCubit that fetches the status', (tester) async {
-      await tester.pumpWidget(App(onboardingRepository: onboardingRepository));
+      await tester.pumpWidget(
+        App(
+          onboardingRepository: onboardingRepository,
+          metricsRepository: metricsRepository,
+        ),
+      );
       final context = tester.element(find.byType(AppView));
 
       expect(context.read<AppCubit>(), isA<AppCubit>());
@@ -51,7 +71,12 @@ void main() {
     testWidgets('shows CapturePage once onboarding is complete', (
       tester,
     ) async {
-      await tester.pumpWidget(App(onboardingRepository: onboardingRepository));
+      await tester.pumpWidget(
+        App(
+          onboardingRepository: onboardingRepository,
+          metricsRepository: metricsRepository,
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(CapturePage), findsOneWidget);
     });
@@ -61,7 +86,12 @@ void main() {
     ) async {
       stubStatus(completed: false);
 
-      await tester.pumpWidget(App(onboardingRepository: onboardingRepository));
+      await tester.pumpWidget(
+        App(
+          onboardingRepository: onboardingRepository,
+          metricsRepository: metricsRepository,
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(SetupPage), findsOneWidget);
