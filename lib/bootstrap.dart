@@ -2,15 +2,19 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:local_database/local_database.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:terse/app_bloc_observer.dart';
 
 /// The type definition for the builder widget.
 typedef BootstrapBuilder = FutureOr<Widget> Function(
   SharedPreferencesAsync sharedPreferences,
+  LocalDatabase localDatabase,
 );
 
 Future<void> bootstrap(BootstrapBuilder builder) async {
@@ -37,5 +41,14 @@ Future<void> bootstrap(BootstrapBuilder builder) async {
   Bloc.observer = const AppBlocObserver();
   final sharedPreferences = SharedPreferencesAsync();
 
-  runApp(await builder(sharedPreferences));
+  final localDatabase = LocalDatabase(
+    driftDatabase(
+      name: 'terse',
+      native: const DriftNativeOptions(
+        databaseDirectory: path_provider.getApplicationDocumentsDirectory,
+      ),
+    ),
+  );
+
+  runApp(await builder(sharedPreferences, localDatabase));
 }

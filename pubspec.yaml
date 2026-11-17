@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   bloc: ^9.2.1
+  drift_flutter: ^0.3.1
   equatable: ^3.0.0
   flutter:
     sdk: flutter
@@ -17,9 +18,14 @@ dependencies:
     sdk: flutter
   go_router: ^18.1.4
   intl: ^0.20.2
+  local_database:
+    path: packages/local_database
   material_ui: ^1.1.1
+  metrics_repository:
+    path: packages/metrics_repository
   onboarding_repository:
     path: packages/onboarding_repository
+  path_provider: ^2.1.6
   shared_preferences: ^2.5.6
   shared_preferences_storage:
     path: packages/shared_preferences_storage
