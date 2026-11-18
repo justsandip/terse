@@ -113,6 +113,7 @@ class TerseTheme {
 
   ChipThemeData get _chipTheme {
     return ChipThemeData(
+      backgroundColor: TerseColors.white,
       side: const BorderSide(color: TerseColors.sand),
       shape: const StadiumBorder(),
       labelStyle: TerseTextStyles.mobile.labelMedium.copyWith(

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:metrics_repository/metrics_repository.dart';
 import 'package:terse/setup/setup.dart';
 
 class SetupPage extends StatelessWidget {
@@ -8,7 +9,8 @@ class SetupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SetupCubit(),
+      create: (context) =>
+          SetupBloc(metricsRepository: context.read<MetricsRepository>()),
       child: const SetupView(),
     );
   }

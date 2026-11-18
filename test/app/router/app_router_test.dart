@@ -1,5 +1,7 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:metrics_repository/metrics_repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:onboarding_repository/onboarding_repository.dart';
 import 'package:terse/app/app.dart';
@@ -11,14 +13,20 @@ import 'package:terse/splash/splash.dart';
 
 class _MockOnboardingRepository extends Mock implements OnboardingRepository;
 
+class _MockMetricsRepository extends Mock implements MetricsRepository;
+
 void main() {
   group(AppRouter, () {
     late OnboardingRepository onboardingRepository;
+    late MetricsRepository metricsRepository;
+
     late AppCubit appCubit;
     late AppRouter appRouter;
 
     setUp(() {
       onboardingRepository = _MockOnboardingRepository();
+      metricsRepository = _MockMetricsRepository();
+
       appCubit = AppCubit(onboardingRepository: onboardingRepository);
       appRouter = AppRouter(appCubit: appCubit);
     });
@@ -35,10 +43,13 @@ void main() {
 
     Future<void> pumpRouter(WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp.router(
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: appRouter.router,
+        RepositoryProvider.value(
+          value: metricsRepository,
+          child: MaterialApp.router(
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: appRouter.router,
+          ),
         ),
       );
       await tester.pumpAndSettle();
