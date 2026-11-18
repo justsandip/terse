@@ -81,6 +81,7 @@ void main() {
     test('styles chips', () {
       final chipTheme = themeData.chipTheme;
 
+      expect(chipTheme.backgroundColor, equals(TerseColors.white));
       expect(chipTheme.side?.color, equals(TerseColors.sand));
       expect(chipTheme.shape, isA<StadiumBorder>());
       expect(chipTheme.labelStyle?.fontSize, equals(14));

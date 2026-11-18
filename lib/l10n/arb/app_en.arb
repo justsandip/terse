@@ -8,14 +8,9 @@
   "@setupTitle": {
     "description": "Title of the setup screen"
   },
-  "setupSubtitle": "Pick up to {max} metrics. You can change them later.",
+  "setupSubtitle": "Choose what you log each day. You can change this later.",
   "@setupSubtitle": {
-    "description": "Subtitle of the setup screen",
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
+    "description": "Subtitle of the setup screen"
   },
   "setupTemplatesLabel": "Start from a template",
   "@setupTemplatesLabel": {
@@ -35,11 +30,11 @@
   },
   "setupMetricsLabel": "Your metrics",
   "@setupMetricsLabel": {
-    "description": "Label above the metric chips on the setup screen"
+    "description": "Label above the list of chosen metrics"
   },
   "setupMetricsCount": "{selected} of {max}",
   "@setupMetricsCount": {
-    "description": "How many metrics are selected out of the maximum",
+    "description": "How many metrics are chosen out of the maximum",
     "placeholders": {
       "selected": {
         "type": "int"
@@ -48,6 +43,31 @@
         "type": "int"
       }
     }
+  },
+  "setupMetricsEmpty": "No metrics yet. Pick a template or add one.",
+  "@setupMetricsEmpty": {
+    "description": "Shown when no metric is chosen yet"
+  },
+  "setupAddMetric": "Add a metric",
+  "@setupAddMetric": {
+    "description": "Label of the button that opens the metric picker"
+  },
+  "setupAddMetricSheetTitle": "Choose a metric",
+  "@setupAddMetricSheetTitle": {
+    "description": "Title of the metric picker"
+  },
+  "setupRemoveMetric": "Remove {metric}",
+  "@setupRemoveMetric": {
+    "description": "Tooltip of the button that removes a chosen metric",
+    "placeholders": {
+      "metric": {
+        "type": "String"
+      }
+    }
+  },
+  "setupSaveFailed": "Could not save your metrics. Try again.",
+  "@setupSaveFailed": {
+    "description": "Shown when saving the chosen metrics fails"
   },
   "setupStartTracking": "Start tracking",
   "@setupStartTracking": {
@@ -80,5 +100,45 @@
   "metricExercise": "Exercise",
   "@metricExercise": {
     "description": "Name of the exercise metric"
+  },
+  "metricExerciseType": "Exercise type",
+  "@metricExerciseType": {
+    "description": "Name of the exercise type metric"
+  },
+  "metricExerciseMinutes": "Exercise minutes",
+  "@metricExerciseMinutes": {
+    "description": "Name of the exercise minutes metric"
+  },
+  "metricDescriptionScale": "{min} to {max}",
+  "@metricDescriptionScale": {
+    "description": "Describes a metric measured on a scale",
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "metricDescriptionChoice": "One of a list",
+  "@metricDescriptionChoice": {
+    "description": "Describes a metric where one option is picked"
+  },
+  "metricDescriptionBoolean": "Yes or no",
+  "@metricDescriptionBoolean": {
+    "description": "Describes a metric answered with yes or no"
+  },
+  "unitHours": "Hours",
+  "@unitHours": {
+    "description": "The unit of hours"
+  },
+  "unitCups": "Cups",
+  "@unitCups": {
+    "description": "The unit of cups"
+  },
+  "unitMinutes": "Minutes",
+  "@unitMinutes": {
+    "description": "The unit of minutes"
   }
 }
