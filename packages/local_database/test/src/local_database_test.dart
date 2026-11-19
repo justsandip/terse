@@ -16,6 +16,8 @@ void main() {
       required String key,
       String kind = 'scale',
       int position = 0,
+      double? stepValue,
+      double? startValue,
       DateTime? archivedAt,
       DateTime? deletedAt,
     }) {
@@ -27,6 +29,8 @@ void main() {
         minValue: 1,
         maxValue: 5,
         choices: null,
+        stepValue: stepValue,
+        startValue: startValue,
         position: position,
         archivedAt: archivedAt,
         createdAt: now,
@@ -73,8 +77,8 @@ void main() {
       await database.close();
     });
 
-    test('is at schema version 2', () {
-      expect(database.schemaVersion, equals(2));
+    test('is at schema version 3', () {
+      expect(database.schemaVersion, equals(3));
     });
 
     group('fetchMetrics', () {
@@ -134,6 +138,23 @@ void main() {
 
         expect(rows, hasLength(1));
         expect(rows.single.kind, equals('number'));
+      });
+
+      test('keeps the step and the start value of a number', () async {
+        await database.upsertMetrics([
+          metric(
+            id: 'a',
+            key: 'sleep',
+            kind: 'number',
+            stepValue: 0.5,
+            startValue: 7,
+          ),
+        ]);
+
+        final rows = await database.fetchMetrics();
+
+        expect(rows.single.stepValue, equals(0.5));
+        expect(rows.single.startValue, equals(7));
       });
 
       test('rejects two metrics that share a key', () async {

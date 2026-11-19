@@ -12,7 +12,7 @@ class LocalDatabase extends _$LocalDatabase {
   new(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -22,6 +22,10 @@ class LocalDatabase extends _$LocalDatabase {
         if (from < 2) {
           await migrator.createTable(entries);
           await migrator.createTable(entryValues);
+        }
+        if (from < 3) {
+          await migrator.addColumn(metrics, metrics.stepValue);
+          await migrator.addColumn(metrics, metrics.startValue);
         }
       },
       beforeOpen: (details) => customStatement('PRAGMA foreign_keys = ON'),

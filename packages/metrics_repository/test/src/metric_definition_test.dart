@@ -33,6 +33,8 @@ void main() {
             'unit': 'hours',
             'min': 0,
             'max': 16,
+            'step': 0.5,
+            'start': 7,
           }),
         );
         expect(

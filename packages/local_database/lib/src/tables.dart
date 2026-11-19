@@ -29,6 +29,12 @@ class Metrics extends Table {
   /// A JSON list of the options of a choice.
   TextColumn get choices => text().nullable()();
 
+  /// How much a number goes up or down with one tap.
+  RealColumn get stepValue => real().nullable()();
+
+  /// The value a number jumps to on its first tap.
+  RealColumn get startValue => real().nullable()();
+
   /// Where the metric sits in the user's list, lowest first.
   IntColumn get position => integer().withDefault(const Constant(0))();
 

@@ -19,6 +19,8 @@ class MetricDefinition extends Equatable {
     this.unit,
     this.min,
     this.max,
+    this.step,
+    this.start,
     this.choices = const [],
   });
 
@@ -44,6 +46,17 @@ class MetricDefinition extends Equatable {
   /// The highest allowed value of a number or a scale.
   final double? max;
 
+  /// How much a number goes up or down with one tap, e.g. `0.5` for hours of
+  /// sleep. A number without one steps by 1.
+  final double? step;
+
+  /// The value a number jumps to on its first tap, e.g. `7` for hours of
+  /// sleep.
+  ///
+  /// Until the user taps, the number has no value at all. It is not saved as
+  /// zero or as [start].
+  final double? start;
+
   /// The allowed options of a choice.
   @JsonKey(toJson: _choicesToJson)
   final List<String> choices;
@@ -52,7 +65,7 @@ class MetricDefinition extends Equatable {
   Map<String, Object?> toJson() => _$MetricDefinitionToJson(this);
 
   @override
-  List<Object?> get props => [key, kind, unit, min, max, choices];
+  List<Object?> get props => [key, kind, unit, min, max, step, start, choices];
 
   static List<String>? _choicesToJson(List<String> choices) =>
       choices.isEmpty ? null : choices;

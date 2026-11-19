@@ -13,6 +13,8 @@ MetricDefinition _$MetricDefinitionFromJson(Map<String, dynamic> json) =>
       unit: json['unit'] as String?,
       min: (json['min'] as num?)?.toDouble(),
       max: (json['max'] as num?)?.toDouble(),
+      step: (json['step'] as num?)?.toDouble(),
+      start: (json['start'] as num?)?.toDouble(),
       choices:
           (json['choices'] as List<dynamic>?)
               ?.map((e) => e as String)
@@ -27,6 +29,8 @@ Map<String, dynamic> _$MetricDefinitionToJson(MetricDefinition instance) =>
       'unit': ?instance.unit,
       'min': ?instance.min,
       'max': ?instance.max,
+      'step': ?instance.step,
+      'start': ?instance.start,
       'choices': ?MetricDefinition._choicesToJson(instance.choices),
     };
 

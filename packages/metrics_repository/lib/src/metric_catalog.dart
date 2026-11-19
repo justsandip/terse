@@ -13,6 +13,8 @@ abstract class MetricCatalog {
     unit: 'hours',
     min: 0,
     max: 16,
+    step: 0.5,
+    start: 7,
   );
 
   /// How well the user slept, from 1 to 5.
@@ -54,6 +56,8 @@ abstract class MetricCatalog {
     unit: 'cups',
     min: 0,
     max: 15,
+    step: 1,
+    start: 1,
   );
 
   /// The type of exercise.
@@ -70,6 +74,8 @@ abstract class MetricCatalog {
     unit: 'minutes',
     min: 0,
     max: 600,
+    step: 5,
+    start: 30,
   );
 
   /// Every built-in metric.

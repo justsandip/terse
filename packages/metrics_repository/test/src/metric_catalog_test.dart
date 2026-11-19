@@ -41,6 +41,19 @@ void main() {
       }
     });
 
+    test('numbers step by a positive amount and start within their limits', () {
+      final numbers = MetricCatalog.all.where(
+        (metric) => metric.kind == MetricKind.number,
+      );
+
+      for (final metric in numbers) {
+        expect(metric.step, isNotNull);
+        expect(metric.step, greaterThan(0));
+        expect(metric.start, isNotNull);
+        expect(metric.start, inInclusiveRange(metric.min!, metric.max!));
+      }
+    });
+
     test('choices have options', () {
       final choices = MetricCatalog.all.where(
         (metric) => metric.kind == MetricKind.choice,

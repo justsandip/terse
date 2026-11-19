@@ -18,6 +18,8 @@ void main() {
     double? minValue = 1,
     double? maxValue = 5,
     String? choices,
+    double? stepValue,
+    double? startValue,
     int position = 0,
     DateTime? archivedAt,
     DateTime? deletedAt,
@@ -30,6 +32,8 @@ void main() {
       minValue: minValue,
       maxValue: maxValue,
       choices: choices,
+      stepValue: stepValue,
+      startValue: startValue,
       position: position,
       archivedAt: archivedAt,
       createdAt: earlier,
@@ -37,6 +41,14 @@ void main() {
       deletedAt: deletedAt,
     );
   }
+
+  group(MetricsFailure, () {
+    test('toString includes the type and the error', () {
+      const failure = FetchMetricsFailure('boom');
+
+      expect(failure.toString(), equals('FetchMetricsFailure: boom'));
+    });
+  });
 
   group(MetricsRepository, () {
     late LocalDatabase database;
@@ -74,6 +86,8 @@ void main() {
               unit: 'hours',
               minValue: 0,
               maxValue: 16,
+              stepValue: 0.5,
+              startValue: 7,
             ),
             row(key: 'mood'),
             row(
@@ -156,6 +170,10 @@ void main() {
         expect(sleepHours.kind, equals('number'));
         expect(sleepHours.unit, equals('hours'));
         expect(sleepHours.maxValue, equals(16));
+        expect(sleepHours.stepValue, equals(0.5));
+        expect(sleepHours.startValue, equals(7));
+        expect(energy.stepValue, isNull);
+        expect(energy.startValue, isNull);
         expect(exerciseType.kind, equals('choice'));
         expect(
           exerciseType.choices,
@@ -197,7 +215,10 @@ void main() {
 
       test('archives a metric that is no longer chosen', () async {
         when(() => database.fetchAllMetrics()).thenAnswer(
-          (_) async => [row(key: 'mood', position: 3), row(key: 'energy')],
+          (_) async => [
+            row(key: 'mood', position: 3, stepValue: 2, startValue: 3),
+            row(key: 'energy'),
+          ],
         );
 
         await repository.saveMetrics([MetricCatalog.energy]);
@@ -210,6 +231,8 @@ void main() {
         expect(mood.updatedAt, equals(now));
         expect(mood.createdAt, equals(earlier));
         expect(mood.position, equals(3));
+        expect(mood.stepValue, equals(2));
+        expect(mood.startValue, equals(3));
       });
 
       test('leaves archived and deleted metrics alone', () async {

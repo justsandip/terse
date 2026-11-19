@@ -53,6 +53,8 @@ class MetricsRepository {
             unit: metric.unit,
             minValue: metric.min,
             maxValue: metric.max,
+            stepValue: metric.step,
+            startValue: metric.start,
             choices: metric.choices.isEmpty ? null : jsonEncode(metric.choices),
             position: index,
             createdAt: existing[metric.key]?.createdAt ?? now,
@@ -72,6 +74,8 @@ class MetricsRepository {
             unit: row.unit,
             minValue: row.minValue,
             maxValue: row.maxValue,
+            stepValue: row.stepValue,
+            startValue: row.startValue,
             choices: row.choices,
             position: row.position,
             archivedAt: now,
@@ -95,6 +99,8 @@ class MetricsRepository {
       unit: row.unit,
       min: row.minValue,
       max: row.maxValue,
+      step: row.stepValue,
+      start: row.startValue,
       choices: choices == null
           ? const []
           : (jsonDecode(choices) as List<Object?>).cast<String>(),
