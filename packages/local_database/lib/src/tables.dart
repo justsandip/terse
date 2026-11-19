@@ -54,7 +54,7 @@ class Metrics extends Table {
 /// The days a user has logged: one entry per calendar day.
 @DataClassName('EntryRow')
 class Entries extends Table {
-  /// The unique id of the entry, a UUID.
+  /// The unique id of the entry: its date, as `YYYY-MM-DD`.
   TextColumn get id => text()();
 
   /// The calendar day the entry is about, as `YYYY-MM-DD` in the user's own

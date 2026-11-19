@@ -903,7 +903,7 @@ class $EntriesTable extends Entries with TableInfo<$EntriesTable, EntryRow> {
 }
 
 class EntryRow extends DataClass implements Insertable<EntryRow> {
-  /// The unique id of the entry, a UUID.
+  /// The unique id of the entry: its date, as `YYYY-MM-DD`.
   final String id;
 
   /// The calendar day the entry is about, as `YYYY-MM-DD` in the user's own
