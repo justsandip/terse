@@ -35,6 +35,36 @@ void main() {
       );
     }
 
+    EntryRow entry({
+      required String id,
+      String date = '2026-11-18',
+      String? note,
+      DateTime? deletedAt,
+    }) {
+      return EntryRow(
+        id: id,
+        date: date,
+        note: note,
+        createdAt: now,
+        updatedAt: now,
+        deletedAt: deletedAt,
+      );
+    }
+
+    EntryValueRow value({
+      required String entryId,
+      required String metricId,
+      double? numberValue,
+      String? textValue,
+    }) {
+      return EntryValueRow(
+        entryId: entryId,
+        metricId: metricId,
+        numberValue: numberValue,
+        textValue: textValue,
+      );
+    }
+
     setUp(() {
       database = LocalDatabase(NativeDatabase.memory());
     });
@@ -43,8 +73,8 @@ void main() {
       await database.close();
     });
 
-    test('is at schema version 1', () {
-      expect(database.schemaVersion, equals(1));
+    test('is at schema version 2', () {
+      expect(database.schemaVersion, equals(2));
     });
 
     group('fetchMetrics', () {
@@ -114,6 +144,157 @@ void main() {
           ]),
           throwsA(anything),
         );
+      });
+    });
+
+    group('entries', () {
+      setUp(() async {
+        await database.upsertMetrics([
+          metric(id: 'mood', key: 'mood'),
+          metric(id: 'sleep', key: 'sleep', kind: 'number'),
+          metric(id: 'exercise', key: 'exercise', kind: 'choice'),
+        ]);
+      });
+
+      group('fetchEntryByDate', () {
+        test('returns null when the day has no entry', () async {
+          expect(await database.fetchEntryByDate('2026-11-18'), isNull);
+        });
+
+        test('returns the entry of that day', () async {
+          await database.saveEntry(entry(id: 'a', note: 'Good run'), []);
+
+          final row = await database.fetchEntryByDate('2026-11-18');
+
+          expect(row?.id, equals('a'));
+          expect(row?.note, equals('Good run'));
+        });
+
+        test('leaves out a deleted entry', () async {
+          await database.saveEntry(entry(id: 'a', deletedAt: now), []);
+
+          expect(await database.fetchEntryByDate('2026-11-18'), isNull);
+        });
+
+        test('returns a deleted entry when asked to', () async {
+          await database.saveEntry(entry(id: 'a', deletedAt: now), []);
+
+          final row = await database.fetchEntryByDate(
+            '2026-11-18',
+            includeDeleted: true,
+          );
+
+          expect(row?.id, equals('a'));
+        });
+      });
+
+      group('saveEntry', () {
+        test('saves an entry with its values', () async {
+          await database.saveEntry(entry(id: 'a'), [
+            value(entryId: 'a', metricId: 'mood', numberValue: 4),
+            value(entryId: 'a', metricId: 'exercise', textValue: 'walk'),
+          ]);
+
+          final rows = await database.fetchEntryValues('a');
+
+          expect(
+            rows.map((row) => row.metricId),
+            unorderedEquals(['mood', 'exercise']),
+          );
+          expect(
+            rows.singleWhere((row) => row.metricId == 'mood').numberValue,
+            equals(4),
+          );
+          expect(
+            rows.singleWhere((row) => row.metricId == 'exercise').textValue,
+            equals('walk'),
+          );
+        });
+
+        test('saves an entry that has no values', () async {
+          await database.saveEntry(entry(id: 'a'), []);
+
+          expect(await database.fetchEntryValues('a'), isEmpty);
+        });
+
+        test('replaces the values the entry had before', () async {
+          await database.saveEntry(entry(id: 'a'), [
+            value(entryId: 'a', metricId: 'mood', numberValue: 4),
+            value(entryId: 'a', metricId: 'sleep', numberValue: 6.5),
+          ]);
+
+          await database.saveEntry(entry(id: 'a', note: 'Edited'), [
+            value(entryId: 'a', metricId: 'mood', numberValue: 2),
+          ]);
+
+          final rows = await database.fetchEntryValues('a');
+
+          expect(rows, hasLength(1));
+          expect(rows.single.metricId, equals('mood'));
+          expect(rows.single.numberValue, equals(2));
+          expect(
+            (await database.fetchEntryByDate('2026-11-18'))?.note,
+            equals('Edited'),
+          );
+        });
+
+        test('keeps the values of other entries', () async {
+          await database.saveEntry(entry(id: 'a'), [
+            value(entryId: 'a', metricId: 'mood', numberValue: 4),
+          ]);
+
+          await database.saveEntry(entry(id: 'b', date: '2026-11-19'), [
+            value(entryId: 'b', metricId: 'mood', numberValue: 3),
+          ]);
+
+          expect(await database.fetchEntryValues('a'), hasLength(1));
+          expect(await database.fetchEntryValues('b'), hasLength(1));
+        });
+
+        test('rejects two entries for the same day', () async {
+          await database.saveEntry(entry(id: 'a'), []);
+
+          await expectLater(
+            database.saveEntry(entry(id: 'b'), []),
+            throwsA(anything),
+          );
+        });
+
+        test('rejects a value for a metric that does not exist', () async {
+          await expectLater(
+            database.saveEntry(entry(id: 'a'), [
+              value(entryId: 'a', metricId: 'missing', numberValue: 1),
+            ]),
+            throwsA(anything),
+          );
+        });
+
+        test('rejects a value that holds nothing', () async {
+          await expectLater(
+            database.saveEntry(entry(id: 'a'), [
+              value(entryId: 'a', metricId: 'mood'),
+            ]),
+            throwsA(anything),
+          );
+        });
+
+        test('leaves the old entry as it was when a save fails', () async {
+          await database.saveEntry(entry(id: 'a'), [
+            value(entryId: 'a', metricId: 'mood', numberValue: 4),
+          ]);
+
+          await expectLater(
+            database.saveEntry(entry(id: 'a', note: 'Broken'), [
+              value(entryId: 'a', metricId: 'missing', numberValue: 1),
+            ]),
+            throwsA(anything),
+          );
+
+          final rows = await database.fetchEntryValues('a');
+
+          expect(rows.single.metricId, equals('mood'));
+          expect((await database.fetchEntryByDate('2026-11-18'))?.note, isNull);
+        });
       });
     });
   });
