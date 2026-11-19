@@ -31,7 +31,6 @@ final class NumberValue extends MetricValue {
 /// {@endtemplate}
 final class BooleanValue extends MetricValue {
   /// {@macro boolean_value}
-  // ignore: avoid_positional_boolean_parameters
   const new(this.value);
 
   /// Whether the answer is yes.
