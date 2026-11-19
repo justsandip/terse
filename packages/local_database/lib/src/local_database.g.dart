@@ -78,6 +78,28 @@ class $MetricsTable extends Metrics with TableInfo<$MetricsTable, MetricRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _stepValueMeta = const VerificationMeta(
+    'stepValue',
+  );
+  @override
+  late final GeneratedColumn<double> stepValue = GeneratedColumn<double>(
+    'step_value',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _startValueMeta = const VerificationMeta(
+    'startValue',
+  );
+  @override
+  late final GeneratedColumn<double> startValue = GeneratedColumn<double>(
+    'start_value',
+    aliasedName,
+    true,
+    type: DriftSqlType.double,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _positionMeta = const VerificationMeta(
     'position',
   );
@@ -143,6 +165,8 @@ class $MetricsTable extends Metrics with TableInfo<$MetricsTable, MetricRow> {
     minValue,
     maxValue,
     choices,
+    stepValue,
+    startValue,
     position,
     archivedAt,
     createdAt,
@@ -204,6 +228,18 @@ class $MetricsTable extends Metrics with TableInfo<$MetricsTable, MetricRow> {
       context.handle(
         _choicesMeta,
         choices.isAcceptableOrUnknown(data['choices']!, _choicesMeta),
+      );
+    }
+    if (data.containsKey('step_value')) {
+      context.handle(
+        _stepValueMeta,
+        stepValue.isAcceptableOrUnknown(data['step_value']!, _stepValueMeta),
+      );
+    }
+    if (data.containsKey('start_value')) {
+      context.handle(
+        _startValueMeta,
+        startValue.isAcceptableOrUnknown(data['start_value']!, _startValueMeta),
       );
     }
     if (data.containsKey('position')) {
@@ -277,6 +313,14 @@ class $MetricsTable extends Metrics with TableInfo<$MetricsTable, MetricRow> {
         DriftSqlType.string,
         data['${effectivePrefix}choices'],
       ),
+      stepValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}step_value'],
+      ),
+      startValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.double,
+        data['${effectivePrefix}start_value'],
+      ),
       position: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}position'],
@@ -329,6 +373,12 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
   /// A JSON list of the options of a choice.
   final String? choices;
 
+  /// How much a number goes up or down with one tap.
+  final double? stepValue;
+
+  /// The value a number jumps to on its first tap.
+  final double? startValue;
+
   /// Where the metric sits in the user's list, lowest first.
   final int position;
 
@@ -354,6 +404,8 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
     this.minValue,
     this.maxValue,
     this.choices,
+    this.stepValue,
+    this.startValue,
     required this.position,
     this.archivedAt,
     required this.createdAt,
@@ -377,6 +429,12 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
     }
     if (!nullToAbsent || choices != null) {
       map['choices'] = Variable<String>(choices);
+    }
+    if (!nullToAbsent || stepValue != null) {
+      map['step_value'] = Variable<double>(stepValue);
+    }
+    if (!nullToAbsent || startValue != null) {
+      map['start_value'] = Variable<double>(startValue);
     }
     map['position'] = Variable<int>(position);
     if (!nullToAbsent || archivedAt != null) {
@@ -405,6 +463,12 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
       choices: choices == null && nullToAbsent
           ? const Value.absent()
           : Value(choices),
+      stepValue: stepValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(stepValue),
+      startValue: startValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(startValue),
       position: Value(position),
       archivedAt: archivedAt == null && nullToAbsent
           ? const Value.absent()
@@ -430,6 +494,8 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
       minValue: serializer.fromJson<double?>(json['minValue']),
       maxValue: serializer.fromJson<double?>(json['maxValue']),
       choices: serializer.fromJson<String?>(json['choices']),
+      stepValue: serializer.fromJson<double?>(json['stepValue']),
+      startValue: serializer.fromJson<double?>(json['startValue']),
       position: serializer.fromJson<int>(json['position']),
       archivedAt: serializer.fromJson<DateTime?>(json['archivedAt']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -448,6 +514,8 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
       'minValue': serializer.toJson<double?>(minValue),
       'maxValue': serializer.toJson<double?>(maxValue),
       'choices': serializer.toJson<String?>(choices),
+      'stepValue': serializer.toJson<double?>(stepValue),
+      'startValue': serializer.toJson<double?>(startValue),
       'position': serializer.toJson<int>(position),
       'archivedAt': serializer.toJson<DateTime?>(archivedAt),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -464,6 +532,8 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
     Value<double?> minValue = const Value.absent(),
     Value<double?> maxValue = const Value.absent(),
     Value<String?> choices = const Value.absent(),
+    Value<double?> stepValue = const Value.absent(),
+    Value<double?> startValue = const Value.absent(),
     int? position,
     Value<DateTime?> archivedAt = const Value.absent(),
     DateTime? createdAt,
@@ -477,6 +547,8 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
     minValue: minValue.present ? minValue.value : this.minValue,
     maxValue: maxValue.present ? maxValue.value : this.maxValue,
     choices: choices.present ? choices.value : this.choices,
+    stepValue: stepValue.present ? stepValue.value : this.stepValue,
+    startValue: startValue.present ? startValue.value : this.startValue,
     position: position ?? this.position,
     archivedAt: archivedAt.present ? archivedAt.value : this.archivedAt,
     createdAt: createdAt ?? this.createdAt,
@@ -492,6 +564,10 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
       minValue: data.minValue.present ? data.minValue.value : this.minValue,
       maxValue: data.maxValue.present ? data.maxValue.value : this.maxValue,
       choices: data.choices.present ? data.choices.value : this.choices,
+      stepValue: data.stepValue.present ? data.stepValue.value : this.stepValue,
+      startValue: data.startValue.present
+          ? data.startValue.value
+          : this.startValue,
       position: data.position.present ? data.position.value : this.position,
       archivedAt: data.archivedAt.present
           ? data.archivedAt.value
@@ -512,6 +588,8 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
           ..write('minValue: $minValue, ')
           ..write('maxValue: $maxValue, ')
           ..write('choices: $choices, ')
+          ..write('stepValue: $stepValue, ')
+          ..write('startValue: $startValue, ')
           ..write('position: $position, ')
           ..write('archivedAt: $archivedAt, ')
           ..write('createdAt: $createdAt, ')
@@ -530,6 +608,8 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
     minValue,
     maxValue,
     choices,
+    stepValue,
+    startValue,
     position,
     archivedAt,
     createdAt,
@@ -547,6 +627,8 @@ class MetricRow extends DataClass implements Insertable<MetricRow> {
           other.minValue == this.minValue &&
           other.maxValue == this.maxValue &&
           other.choices == this.choices &&
+          other.stepValue == this.stepValue &&
+          other.startValue == this.startValue &&
           other.position == this.position &&
           other.archivedAt == this.archivedAt &&
           other.createdAt == this.createdAt &&
@@ -562,6 +644,8 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
   final Value<double?> minValue;
   final Value<double?> maxValue;
   final Value<String?> choices;
+  final Value<double?> stepValue;
+  final Value<double?> startValue;
   final Value<int> position;
   final Value<DateTime?> archivedAt;
   final Value<DateTime> createdAt;
@@ -576,6 +660,8 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
     this.minValue = const Value.absent(),
     this.maxValue = const Value.absent(),
     this.choices = const Value.absent(),
+    this.stepValue = const Value.absent(),
+    this.startValue = const Value.absent(),
     this.position = const Value.absent(),
     this.archivedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -591,6 +677,8 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
     this.minValue = const Value.absent(),
     this.maxValue = const Value.absent(),
     this.choices = const Value.absent(),
+    this.stepValue = const Value.absent(),
+    this.startValue = const Value.absent(),
     this.position = const Value.absent(),
     this.archivedAt = const Value.absent(),
     required DateTime createdAt,
@@ -610,6 +698,8 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
     Expression<double>? minValue,
     Expression<double>? maxValue,
     Expression<String>? choices,
+    Expression<double>? stepValue,
+    Expression<double>? startValue,
     Expression<int>? position,
     Expression<DateTime>? archivedAt,
     Expression<DateTime>? createdAt,
@@ -625,6 +715,8 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
       if (minValue != null) 'min_value': minValue,
       if (maxValue != null) 'max_value': maxValue,
       if (choices != null) 'choices': choices,
+      if (stepValue != null) 'step_value': stepValue,
+      if (startValue != null) 'start_value': startValue,
       if (position != null) 'position': position,
       if (archivedAt != null) 'archived_at': archivedAt,
       if (createdAt != null) 'created_at': createdAt,
@@ -642,6 +734,8 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
     Value<double?>? minValue,
     Value<double?>? maxValue,
     Value<String?>? choices,
+    Value<double?>? stepValue,
+    Value<double?>? startValue,
     Value<int>? position,
     Value<DateTime?>? archivedAt,
     Value<DateTime>? createdAt,
@@ -657,6 +751,8 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
       minValue: minValue ?? this.minValue,
       maxValue: maxValue ?? this.maxValue,
       choices: choices ?? this.choices,
+      stepValue: stepValue ?? this.stepValue,
+      startValue: startValue ?? this.startValue,
       position: position ?? this.position,
       archivedAt: archivedAt ?? this.archivedAt,
       createdAt: createdAt ?? this.createdAt,
@@ -690,6 +786,12 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
     if (choices.present) {
       map['choices'] = Variable<String>(choices.value);
     }
+    if (stepValue.present) {
+      map['step_value'] = Variable<double>(stepValue.value);
+    }
+    if (startValue.present) {
+      map['start_value'] = Variable<double>(startValue.value);
+    }
     if (position.present) {
       map['position'] = Variable<int>(position.value);
     }
@@ -721,6 +823,8 @@ class MetricsCompanion extends UpdateCompanion<MetricRow> {
           ..write('minValue: $minValue, ')
           ..write('maxValue: $maxValue, ')
           ..write('choices: $choices, ')
+          ..write('stepValue: $stepValue, ')
+          ..write('startValue: $startValue, ')
           ..write('position: $position, ')
           ..write('archivedAt: $archivedAt, ')
           ..write('createdAt: $createdAt, ')
@@ -1520,6 +1624,8 @@ typedef $$MetricsTableCreateCompanionBuilder = MetricsCompanion Function({
   Value<double?> minValue,
   Value<double?> maxValue,
   Value<String?> choices,
+  Value<double?> stepValue,
+  Value<double?> startValue,
   Value<int> position,
   Value<DateTime?> archivedAt,
   required DateTime createdAt,
@@ -1535,6 +1641,8 @@ typedef $$MetricsTableUpdateCompanionBuilder = MetricsCompanion Function({
   Value<double?> minValue,
   Value<double?> maxValue,
   Value<String?> choices,
+  Value<double?> stepValue,
+  Value<double?> startValue,
   Value<int> position,
   Value<DateTime?> archivedAt,
   Value<DateTime> createdAt,
@@ -1607,6 +1715,16 @@ class $$MetricsTableFilterComposer
 
   ColumnFilters<String> get choices => $composableBuilder(
     column: $table.choices,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get stepValue => $composableBuilder(
+    column: $table.stepValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<double> get startValue => $composableBuilder(
+    column: $table.startValue,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1705,6 +1823,16 @@ class $$MetricsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<double> get stepValue => $composableBuilder(
+    column: $table.stepValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<double> get startValue => $composableBuilder(
+    column: $table.startValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get position => $composableBuilder(
     column: $table.position,
     builder: (column) => ColumnOrderings(column),
@@ -1760,6 +1888,14 @@ class $$MetricsTableAnnotationComposer
 
   GeneratedColumn<String> get choices =>
       $composableBuilder(column: $table.choices, builder: (column) => column);
+
+  GeneratedColumn<double> get stepValue =>
+      $composableBuilder(column: $table.stepValue, builder: (column) => column);
+
+  GeneratedColumn<double> get startValue => $composableBuilder(
+    column: $table.startValue,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get position =>
       $composableBuilder(column: $table.position, builder: (column) => column);
@@ -1839,6 +1975,8 @@ class $$MetricsTableTableManager
                 Value<double?> minValue = const Value.absent(),
                 Value<double?> maxValue = const Value.absent(),
                 Value<String?> choices = const Value.absent(),
+                Value<double?> stepValue = const Value.absent(),
+                Value<double?> startValue = const Value.absent(),
                 Value<int> position = const Value.absent(),
                 Value<DateTime?> archivedAt = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -1853,6 +1991,8 @@ class $$MetricsTableTableManager
                 minValue: minValue,
                 maxValue: maxValue,
                 choices: choices,
+                stepValue: stepValue,
+                startValue: startValue,
                 position: position,
                 archivedAt: archivedAt,
                 createdAt: createdAt,
@@ -1869,6 +2009,8 @@ class $$MetricsTableTableManager
                 Value<double?> minValue = const Value.absent(),
                 Value<double?> maxValue = const Value.absent(),
                 Value<String?> choices = const Value.absent(),
+                Value<double?> stepValue = const Value.absent(),
+                Value<double?> startValue = const Value.absent(),
                 Value<int> position = const Value.absent(),
                 Value<DateTime?> archivedAt = const Value.absent(),
                 required DateTime createdAt,
@@ -1883,6 +2025,8 @@ class $$MetricsTableTableManager
                 minValue: minValue,
                 maxValue: maxValue,
                 choices: choices,
+                stepValue: stepValue,
+                startValue: startValue,
                 position: position,
                 archivedAt: archivedAt,
                 createdAt: createdAt,
