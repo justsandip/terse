@@ -93,7 +93,10 @@ class MetricRow extends StatelessWidget {
       child: metric.kind == MetricKind.number
           ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [Flexible(child: title), input],
+              children: [
+                Flexible(child: title),
+                input,
+              ],
             )
           : Column(
               // Stretch, so the input gets the full width and a Wrap can

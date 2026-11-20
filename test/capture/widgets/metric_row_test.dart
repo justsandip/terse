@@ -90,18 +90,15 @@ void main() {
       await tester.tap(find.byTooltip('More Sleep hours'));
 
       verify(
-        () => bloc.add(
-          const CaptureValueSet('sleep_hours', NumberValue(7.5)),
-        ),
+        () => bloc.add(const CaptureValueSet('sleep_hours', NumberValue(7.5))),
       ).called(1);
     });
 
     testWidgets('sends and clears a scale value', (tester) async {
       await pumpRow(tester, metric: MetricCatalog.mood);
       await tester.tap(find.text('3'));
-      verify(
-        () => bloc.add(const CaptureValueSet('mood', NumberValue(3))),
-      ).called(1);
+      verify(() => bloc.add(const CaptureValueSet('mood', NumberValue(3))))
+          .called(1);
 
       await pumpRow(
         tester,
@@ -157,9 +154,7 @@ void main() {
       await tester.tap(find.text('Yes'));
 
       verify(
-        () => bloc.add(
-          const CaptureValueSet('meditated', BooleanValue(true)),
-        ),
+        () => bloc.add(const CaptureValueSet('meditated', BooleanValue(true))),
       ).called(1);
     });
   });

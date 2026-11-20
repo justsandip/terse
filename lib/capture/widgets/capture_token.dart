@@ -65,9 +65,7 @@ class CaptureToken extends StatelessWidget {
         null,
       ),
     };
-    final shape = circle
-        ? const CircleBorder()
-        : const StadiumBorder();
+    final shape = circle ? const CircleBorder() : const StadiumBorder();
 
     Widget content = Container(
       constraints: circle
@@ -105,11 +103,7 @@ class CaptureToken extends StatelessWidget {
       selected: state == TokenState.selected || state == TokenState.confirmed,
       label: semanticsLabel,
       excludeSemantics: semanticsLabel != null,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: shape,
-        child: content,
-      ),
+      child: InkWell(onTap: onTap, customBorder: shape, child: content),
     );
   }
 }

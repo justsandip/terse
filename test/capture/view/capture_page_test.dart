@@ -23,12 +23,10 @@ void main() {
     setUp(() {
       metricsRepository = _MockMetricsRepository();
       entriesRepository = _MockEntriesRepository();
-      when(
-        () => metricsRepository.fetchMetrics(),
-      ).thenAnswer((_) async => [MetricCatalog.mood]);
-      when(
-        () => entriesRepository.fetchEntry(any()),
-      ).thenAnswer((_) async => null);
+      when(() => metricsRepository.fetchMetrics())
+          .thenAnswer((_) async => [MetricCatalog.mood]);
+      when(() => entriesRepository.fetchEntry(any()))
+          .thenAnswer((_) async => null);
     });
 
     testWidgets('loads today and shows the form', (tester) async {
