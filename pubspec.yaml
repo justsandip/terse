@@ -20,7 +20,7 @@ dependencies:
   intl: ^0.20.2
   local_database:
     path: packages/local_database
-  material_ui: ^1.1.1
+  material_ui: ^1.11.1
   metrics_repository:
     path: packages/metrics_repository
   onboarding_repository:
