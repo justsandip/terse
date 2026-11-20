@@ -140,5 +140,211 @@
   "unitMinutes": "Minutes",
   "@unitMinutes": {
     "description": "The unit of minutes"
+  },
+  "captureTitle": "How was today?",
+  "@captureTitle": {
+    "description": "Title of the capture screen"
+  },
+  "captureHelpTooltip": "How Today works",
+  "@captureHelpTooltip": {
+    "description": "Tooltip of the button that opens the help sheet"
+  },
+  "captureSameAsYesterday": "Same as yesterday · {count, plural, =1{1 habit} other{{count} habits}}",
+  "@captureSameAsYesterday": {
+    "description": "Button that confirms every suggested habit that came from yesterday",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "captureUseSuggestions": "Use suggestions · {count, plural, =1{1 habit} other{{count} habits}}",
+  "@captureUseSuggestions": {
+    "description": "Button that confirms every suggested habit that did not come from yesterday",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "captureYesterday": "Yesterday: {value}",
+  "@captureYesterday": {
+    "description": "Caption of a metric whose faded value is yesterday value",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "captureSuggested": "Suggested: {value}",
+  "@captureSuggested": {
+    "description": "Caption of a metric whose faded value is a starting suggestion",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "captureNoteHint": "Anything else? (optional)",
+  "@captureNoteHint": {
+    "description": "Hint of the note field"
+  },
+  "captureSave": "Save today ({saved} of {total})",
+  "@captureSave": {
+    "description": "Label of the save button with how many metrics are set",
+    "placeholders": {
+      "saved": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "captureSaveFailed": "Could not save today. Try again.",
+  "@captureSaveFailed": {
+    "description": "Shown when saving the day fails"
+  },
+  "captureLoadFailed": "Could not load today.",
+  "@captureLoadFailed": {
+    "description": "Shown when loading the capture screen fails"
+  },
+  "captureRetry": "Try again",
+  "@captureRetry": {
+    "description": "Label of the button that retries loading"
+  },
+  "captureSavedTitle": "Saved",
+  "@captureSavedTitle": {
+    "description": "Title of the screen shown after saving"
+  },
+  "captureLoggedIn": "Logged in {seconds} s",
+  "@captureLoggedIn": {
+    "description": "How long logging took, in seconds",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "captureEditToday": "Edit today",
+  "@captureEditToday": {
+    "description": "Button that reopens a saved day for editing"
+  },
+  "captureDecrease": "Less {metric}",
+  "@captureDecrease": {
+    "description": "Tooltip of the minus button of a number",
+    "placeholders": {
+      "metric": {
+        "type": "String"
+      }
+    }
+  },
+  "captureIncrease": "More {metric}",
+  "@captureIncrease": {
+    "description": "Tooltip of the plus button of a number",
+    "placeholders": {
+      "metric": {
+        "type": "String"
+      }
+    }
+  },
+  "captureYes": "Yes",
+  "@captureYes": {
+    "description": "Answer yes"
+  },
+  "captureNo": "No",
+  "@captureNo": {
+    "description": "Answer no"
+  },
+  "captureNotSet": "Not set",
+  "@captureNotSet": {
+    "description": "Shown on a number with no value yet"
+  },
+  "choiceNone": "None",
+  "@choiceNone": {
+    "description": "Exercise option: none"
+  },
+  "choiceWalk": "Walk",
+  "@choiceWalk": {
+    "description": "Exercise option: walk"
+  },
+  "choiceGym": "Gym",
+  "@choiceGym": {
+    "description": "Exercise option: gym"
+  },
+  "choiceRun": "Run",
+  "@choiceRun": {
+    "description": "Exercise option: run"
+  },
+  "choiceYoga": "Yoga",
+  "@choiceYoga": {
+    "description": "Exercise option: yoga"
+  },
+  "choiceOther": "Other",
+  "@choiceOther": {
+    "description": "Exercise option: other"
+  },
+  "captureValueHours": "{count} h",
+  "@captureValueHours": {
+    "description": "A number of hours",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "captureValueCups": "{count, plural, =1{{count} cup} other{{count} cups}}",
+  "@captureValueCups": {
+    "description": "A number of cups",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "captureValueMinutes": "{count} min",
+  "@captureValueMinutes": {
+    "description": "A number of minutes",
+    "placeholders": {
+      "count": {
+        "type": "num"
+      }
+    }
+  },
+  "captureHelpTitle": "How Today works",
+  "@captureHelpTitle": {
+    "description": "Title of the help sheet"
+  },
+  "captureHelpFadedTitle": "Faded is a suggestion",
+  "@captureHelpFadedTitle": {
+    "description": "Help item title"
+  },
+  "captureHelpFadedBody": "It is the value from yesterday, or a starting value. Nothing is saved until you tap it.",
+  "@captureHelpFadedBody": {
+    "description": "Help item body"
+  },
+  "captureHelpSolidTitle": "Solid is yours",
+  "@captureHelpSolidTitle": {
+    "description": "Help item title"
+  },
+  "captureHelpSolidBody": "Tap a faded value, or press + or −, and it becomes yours. Tap it again to take it back.",
+  "@captureHelpSolidBody": {
+    "description": "Help item body"
+  },
+  "captureHelpHabitsTitle": "Same as yesterday",
+  "@captureHelpHabitsTitle": {
+    "description": "Help item title"
+  },
+  "captureHelpHabitsBody": "Confirms your habits in one tap. Feelings like mood and stress always need your own tap.",
+  "@captureHelpHabitsBody": {
+    "description": "Help item body"
+  },
+  "captureHelpSkipTitle": "Skipped means not tracked",
+  "@captureHelpSkipTitle": {
+    "description": "Help item title"
+  },
+  "captureHelpSkipBody": "Leave a metric untouched and it stays empty. That is different from zero.",
+  "@captureHelpSkipBody": {
+    "description": "Help item body"
   }
 }

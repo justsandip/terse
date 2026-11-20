@@ -10,6 +10,8 @@ environment:
 dependencies:
   bloc: ^9.2.1
   drift_flutter: ^0.3.1
+  entries_repository:
+    path: packages/entries_repository
   equatable: ^3.0.0
   flutter:
     sdk: flutter

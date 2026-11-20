@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:entries_repository/entries_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:metrics_repository/metrics_repository.dart';
@@ -13,11 +14,13 @@ class App extends StatelessWidget {
   const new({
     required this._onboardingRepository,
     required this._metricsRepository,
+    required this._entriesRepository,
     super.key,
   });
 
   final OnboardingRepository _onboardingRepository;
   final MetricsRepository _metricsRepository;
+  final EntriesRepository _entriesRepository;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +28,7 @@ class App extends StatelessWidget {
       providers: [
         RepositoryProvider.value(value: _onboardingRepository),
         RepositoryProvider.value(value: _metricsRepository),
+        RepositoryProvider.value(value: _entriesRepository),
       ],
       child: BlocProvider<AppCubit>(
         create: (context) {

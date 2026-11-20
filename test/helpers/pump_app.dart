@@ -4,6 +4,11 @@ import 'package:terse/l10n/l10n.dart';
 
 extension PumpApp on WidgetTester {
   Future<void> pumpApp(Widget widget) {
+    view
+      ..physicalSize = const Size(390, 844)
+      ..devicePixelRatio = 1;
+    addTearDown(view.reset);
+
     return pumpWidget(
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

@@ -2,6 +2,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:entries_repository/entries_repository.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,21 +17,28 @@ class _MockOnboardingRepository extends Mock implements OnboardingRepository;
 
 class _MockMetricsRepository extends Mock implements MetricsRepository;
 
+class _MockEntriesRepository extends Mock implements EntriesRepository;
+
 class _MockAppCubit extends MockCubit<AppState> implements AppCubit;
 
 void main() {
   group('App', () {
     late OnboardingRepository onboardingRepository;
     late MetricsRepository metricsRepository;
+    late EntriesRepository entriesRepository;
 
     void stubStatus({required bool completed}) {
       when(() => onboardingRepository.fetchOnboardingCompleted())
           .thenAnswer((_) async => completed);
+      when(() => metricsRepository.fetchMetrics()).thenAnswer((_) async => []);
+      when(() => entriesRepository.fetchEntry(any()))
+          .thenAnswer((_) async => null);
     }
 
     setUp(() {
       onboardingRepository = _MockOnboardingRepository();
       metricsRepository = _MockMetricsRepository();
+      entriesRepository = _MockEntriesRepository();
       stubStatus(completed: true);
     });
 
@@ -39,6 +47,7 @@ void main() {
         App(
           onboardingRepository: onboardingRepository,
           metricsRepository: metricsRepository,
+          entriesRepository: entriesRepository,
         ),
       );
       expect(find.byType(AppView), findsOneWidget);
@@ -49,6 +58,7 @@ void main() {
         App(
           onboardingRepository: onboardingRepository,
           metricsRepository: metricsRepository,
+          entriesRepository: entriesRepository,
         ),
       );
       final context = tester.element(find.byType(AppView));
@@ -60,6 +70,7 @@ void main() {
         App(
           onboardingRepository: onboardingRepository,
           metricsRepository: metricsRepository,
+          entriesRepository: entriesRepository,
         ),
       );
       final context = tester.element(find.byType(AppView));
@@ -75,6 +86,7 @@ void main() {
         App(
           onboardingRepository: onboardingRepository,
           metricsRepository: metricsRepository,
+          entriesRepository: entriesRepository,
         ),
       );
       await tester.pumpAndSettle();
@@ -90,6 +102,7 @@ void main() {
         App(
           onboardingRepository: onboardingRepository,
           metricsRepository: metricsRepository,
+          entriesRepository: entriesRepository,
         ),
       );
       await tester.pumpAndSettle();
@@ -100,18 +113,35 @@ void main() {
 
   group('AppView', () {
     late AppCubit appCubit;
+    late MetricsRepository metricsRepository;
+    late EntriesRepository entriesRepository;
+
+    setUpAll(() {
+      registerFallbackValue(DateTime(2026));
+    });
 
     setUp(() {
       appCubit = _MockAppCubit();
+      metricsRepository = _MockMetricsRepository();
+      entriesRepository = _MockEntriesRepository();
       whenListen(
         appCubit,
         const Stream<AppState>.empty(),
         initialState: AppState(status: AppStatus.ready),
       );
+      when(() => metricsRepository.fetchMetrics()).thenAnswer((_) async => []);
+      when(() => entriesRepository.fetchEntry(any()))
+          .thenAnswer((_) async => null);
     });
 
     Widget buildSubject() {
-      return BlocProvider.value(value: appCubit, child: AppView());
+      return MultiRepositoryProvider(
+        providers: [
+          RepositoryProvider.value(value: metricsRepository),
+          RepositoryProvider.value(value: entriesRepository),
+        ],
+        child: BlocProvider.value(value: appCubit, child: AppView()),
+      );
     }
 
     testWidgets('renders CapturePage when onboarding is complete', (
