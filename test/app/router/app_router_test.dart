@@ -1,3 +1,4 @@
+import 'package:entries_repository/entries_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
@@ -15,10 +16,13 @@ class _MockOnboardingRepository extends Mock implements OnboardingRepository;
 
 class _MockMetricsRepository extends Mock implements MetricsRepository;
 
+class _MockEntriesRepository extends Mock implements EntriesRepository;
+
 void main() {
   group(AppRouter, () {
     late OnboardingRepository onboardingRepository;
     late MetricsRepository metricsRepository;
+    late EntriesRepository entriesRepository;
 
     late AppCubit appCubit;
     late AppRouter appRouter;
@@ -26,6 +30,7 @@ void main() {
     setUp(() {
       onboardingRepository = _MockOnboardingRepository();
       metricsRepository = _MockMetricsRepository();
+      entriesRepository = _MockEntriesRepository();
 
       appCubit = AppCubit(onboardingRepository: onboardingRepository);
       appRouter = AppRouter(appCubit: appCubit);
@@ -39,12 +44,18 @@ void main() {
     void stubStatus({required bool completed}) {
       when(() => onboardingRepository.fetchOnboardingCompleted())
           .thenAnswer((_) async => completed);
+      when(() => metricsRepository.fetchMetrics()).thenAnswer((_) async => []);
+      when(() => entriesRepository.fetchEntry(any()))
+          .thenAnswer((_) async => null);
     }
 
     Future<void> pumpRouter(WidgetTester tester) async {
       await tester.pumpWidget(
-        RepositoryProvider.value(
-          value: metricsRepository,
+        MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider.value(value: metricsRepository),
+            RepositoryProvider.value(value: entriesRepository),
+          ],
           child: MaterialApp.router(
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
