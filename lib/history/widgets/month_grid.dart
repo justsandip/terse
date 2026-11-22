@@ -107,26 +107,18 @@ class _DayCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final tappable =
-        onTap != null && coverage != DayCoverage.none && !isFuture;
+    final tappable = onTap != null && coverage != DayCoverage.none && !isFuture;
     final (Color? fill, Color text) = switch (coverage) {
       DayCoverage.all => (scheme.primary, scheme.onPrimary),
       DayCoverage.some => (scheme.primaryContainer, scheme.onPrimaryContainer),
-      DayCoverage.none => (
-        null,
-        isFuture ? scheme.outline : scheme.onSurface,
-      ),
+      DayCoverage.none => (null, isFuture ? scheme.outline : scheme.onSurface),
     };
 
     return Center(
       child: Semantics(
         button: tappable,
         excludeSemantics: true,
-        label: [
-          description,
-          coverageLabel,
-          if (isToday) todayLabel,
-        ].join(', '),
+        label: [description, coverageLabel, if (isToday) todayLabel].join(', '),
         child: InkResponse(
           onTap: tappable ? () => onTap!(day) : null,
           customBorder: const CircleBorder(),
@@ -143,9 +135,8 @@ class _DayCell extends StatelessWidget {
             ),
             child: Text(
               '${day.day}',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: text,
-              ),
+              style: Theme.of(context).textTheme.labelMedium
+                  ?.copyWith(color: text),
             ),
           ),
         ),

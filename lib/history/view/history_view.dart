@@ -156,11 +156,7 @@ String _summary(HistoryState state, Entry entry, AppLocalizations l10n) {
 }
 
 class _EntryRow extends StatelessWidget {
-  const new({
-    required this.title,
-    required this.summary,
-    required this.onTap,
-  });
+  const new({required this.title, required this.summary, required this.onTap});
 
   final String title;
   final String summary;
