@@ -398,5 +398,13 @@
   "historyLoadFailed": "Could not load your history.",
   "@historyLoadFailed": {
     "description": "Shown when loading the history fails"
+  },
+  "homeTodayTab": "Today",
+  "@homeTodayTab": {
+    "description": "Label of the Today tab in the navigation bar"
+  },
+  "homeHistoryTab": "History",
+  "@homeHistoryTab": {
+    "description": "Label of the History tab in the navigation bar"
   }
 }
