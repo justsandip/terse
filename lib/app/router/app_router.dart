@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:terse/app/app.dart';
 import 'package:terse/app/router/app_route.dart';
 import 'package:terse/capture/capture.dart';
+import 'package:terse/history/history.dart';
+import 'package:terse/home/home.dart';
 import 'package:terse/setup/setup.dart';
 import 'package:terse/splash/splash.dart';
 
@@ -21,8 +23,26 @@ class AppRouter {
       redirect: (context, state) => _redirect(state),
       routes: [
         AppRoute.splash.route(builder: (_, _) => const SplashPage()),
-        AppRoute.capture.route(builder: (_, _) => const CapturePage()),
         AppRoute.setup.route(builder: (_, _) => const SetupPage()),
+        StatefulShellRoute(
+          builder: (_, _, navigationShell) {
+            return HomeShell(navigationShell: navigationShell);
+          },
+          navigatorContainerBuilder: buildHomeBranches,
+          // The order of the branches is the order of HomeTab.
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                AppRoute.capture.route(builder: (_, _) => const CapturePage()),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                AppRoute.history.route(builder: (_, _) => const HistoryPage()),
+              ],
+            ),
+          ],
+        ),
       ],
     );
   }

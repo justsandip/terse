@@ -12,6 +12,9 @@ enum AppRoute {
   /// The capture screen.
   capture('/'),
 
+  /// The history screen, the second tab of the home shell.
+  history('/history'),
+
   /// The setup screen.
   setup('/setup');
 
