@@ -346,5 +346,57 @@
   "captureHelpSkipBody": "Leave a metric untouched and it stays empty. That is different from zero.",
   "@captureHelpSkipBody": {
     "description": "Help item body"
+  },
+  "historyTitle": "History",
+  "@historyTitle": {
+    "description": "Title of the history screen"
+  },
+  "historyLoggedDays": "{logged} of {total, plural, =1{1 day} other{{total} days}} logged",
+  "@historyLoggedDays": {
+    "description": "How many days of the shown month have an entry",
+    "placeholders": {
+      "logged": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "historyPreviousMonth": "Previous month",
+  "@historyPreviousMonth": {
+    "description": "Tooltip of the button that shows the month before"
+  },
+  "historyNextMonth": "Next month",
+  "@historyNextMonth": {
+    "description": "Tooltip of the button that shows the month after"
+  },
+  "historyLegendAll": "Everything set",
+  "@historyLegendAll": {
+    "description": "Legend: a day where every metric has a value"
+  },
+  "historyLegendSome": "Some set",
+  "@historyLegendSome": {
+    "description": "Legend: a day where some metrics have a value"
+  },
+  "historyDayNone": "Nothing logged",
+  "@historyDayNone": {
+    "description": "Describes a day with no entry"
+  },
+  "historyToday": "today",
+  "@historyToday": {
+    "description": "Added to the description of the current day"
+  },
+  "historyEntriesLabel": "Entries",
+  "@historyEntriesLabel": {
+    "description": "Label above the list of entries of the shown month"
+  },
+  "historyEmpty": "Nothing logged this month.",
+  "@historyEmpty": {
+    "description": "Shown when the shown month has no entries"
+  },
+  "historyLoadFailed": "Could not load your history.",
+  "@historyLoadFailed": {
+    "description": "Shown when loading the history fails"
   }
 }
