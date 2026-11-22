@@ -1,3 +1,6 @@
+// For testing purposes
+// ignore_for_file: avoid_redundant_argument_values
+
 import 'dart:convert';
 
 import 'package:entries_repository/entries_repository.dart';
@@ -37,10 +40,15 @@ void main() {
     );
   }
 
-  EntryRow entryRow({String? note, DateTime? createdAt, DateTime? deletedAt}) {
+  EntryRow entryRow({
+    String date = dayKey,
+    String? note,
+    DateTime? createdAt,
+    DateTime? deletedAt,
+  }) {
     return EntryRow(
-      id: dayKey,
-      date: dayKey,
+      id: date,
+      date: date,
       note: note,
       createdAt: createdAt ?? earlier,
       updatedAt: earlier,
@@ -50,11 +58,12 @@ void main() {
 
   EntryValueRow valueRow(
     String metricId, {
+    String entryId = dayKey,
     double? numberValue,
     String? textValue,
   }) {
     return EntryValueRow(
-      entryId: dayKey,
+      entryId: entryId,
       metricId: metricId,
       numberValue: numberValue,
       textValue: textValue,
@@ -196,6 +205,136 @@ void main() {
 
         await expectLater(
           repository.fetchEntry(day),
+          throwsA(isA<FetchEntryFailure>()),
+        );
+      });
+    });
+
+    group('fetchEntries', () {
+      final from = DateTime(2026, 11, 16);
+      final to = DateTime(2026, 11, 18);
+
+      setUp(() {
+        when(() => database.fetchEntriesBetween(any(), any()))
+            .thenAnswer((_) async => []);
+        when(() => database.fetchValuesBetween(any(), any()))
+            .thenAnswer((_) async => []);
+      });
+
+      test(
+        'returns nothing, and reads no more, when the range is empty',
+        () async {
+          expect(await repository.fetchEntries(from: from, to: to), isEmpty);
+
+          verifyNever(() => database.fetchValuesBetween(any(), any()));
+          verifyNever(() => database.fetchAllMetrics());
+        },
+      );
+
+      test('asks for the days as year-month-day, zero padded', () async {
+        await repository.fetchEntries(
+          from: DateTime(2026, 1, 5, 23, 59),
+          to: DateTime(2026, 2, 1),
+        );
+
+        verify(() => database.fetchEntriesBetween('2026-01-05', '2026-02-01'))
+            .called(1);
+      });
+
+      test(
+        'maps each day to an entry with its own values, oldest first',
+        () async {
+          when(() => database.fetchEntriesBetween(any(), any())).thenAnswer(
+            (_) async => [
+              entryRow(date: '2026-11-16', note: 'Slow start'),
+              entryRow(date: '2026-11-18'),
+            ],
+          );
+          when(() => database.fetchValuesBetween(any(), any())).thenAnswer(
+            (_) async => [
+              valueRow('mood', entryId: '2026-11-18', numberValue: 4),
+              valueRow('sleep_hours', entryId: '2026-11-16', numberValue: 6),
+              valueRow('reading', entryId: '2026-11-18', numberValue: 30),
+            ],
+          );
+
+          final entries = await repository.fetchEntries(from: from, to: to);
+
+          expect(
+            entries,
+            equals([
+              Entry(
+                date: DateTime(2026, 11, 16),
+                note: 'Slow start',
+                values: const {'sleep_hours': NumberValue(6)},
+              ),
+              Entry(
+                date: DateTime(2026, 11, 18),
+                values: const {
+                  'mood': NumberValue(4),
+                  'reading': NumberValue(30),
+                },
+              ),
+            ]),
+          );
+        },
+      );
+
+      test('returns a day that has no values as an empty entry', () async {
+        when(() => database.fetchEntriesBetween(any(), any())).thenAnswer(
+          (_) async => [entryRow(date: '2026-11-17', note: 'Rest day')],
+        );
+
+        final entries = await repository.fetchEntries(from: from, to: to);
+
+        expect(
+          entries,
+          equals([Entry(date: DateTime(2026, 11, 17), note: 'Rest day')]),
+        );
+      });
+
+      test(
+        'reads the range in one query for entries and one for values',
+        () async {
+          when(() => database.fetchEntriesBetween(any(), any())).thenAnswer(
+            (_) async => [
+              entryRow(date: '2026-11-16'),
+              entryRow(date: '2026-11-17'),
+              entryRow(date: '2026-11-18'),
+            ],
+          );
+
+          await repository.fetchEntries(from: from, to: to);
+
+          verify(() => database.fetchEntriesBetween(any(), any())).called(1);
+          verify(() => database.fetchValuesBetween(any(), any())).called(1);
+          verifyNever(() => database.fetchEntryValues(any()));
+        },
+      );
+
+      test('throws FetchEntryFailure when the database fails', () async {
+        when(() => database.fetchEntriesBetween(any(), any()))
+            .thenThrow(Exception('x'));
+
+        await expectLater(
+          repository.fetchEntries(from: from, to: to),
+          throwsA(isA<FetchEntryFailure>()),
+        );
+      });
+
+      test('throws FetchEntryFailure for a stored unknown kind', () async {
+        when(() => database.fetchEntriesBetween(any(), any()))
+            .thenAnswer((_) async => [entryRow(date: '2026-11-18')]);
+        when(() => database.fetchValuesBetween(any(), any())).thenAnswer(
+          (_) async => [
+            valueRow('mood', entryId: '2026-11-18', numberValue: 3),
+          ],
+        );
+        when(() => database.fetchAllMetrics())
+            .thenAnswer((_) async => [metricRow(key: 'mood', kind: 'nope')]);
+
+        await expectLater(
+          repository.fetchEntries(from: from, to: to),
           throwsA(isA<FetchEntryFailure>()),
         );
       });

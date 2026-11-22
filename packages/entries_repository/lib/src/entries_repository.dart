@@ -50,6 +50,68 @@ class EntriesRepository {
     }
   }
 
+  /// Returns the entries from [from] to [to], both days included, oldest
+  /// first.
+  ///
+  /// A day with no entry is left out, so the list can be shorter than the
+  /// range. If [from] is after [to] the list is empty. The values of an
+  /// archived metric are included, as in [fetchEntry].
+  ///
+  /// It reads the whole range in a fixed number of queries, however many days
+  /// it holds.
+  ///
+  /// Throws a [FetchEntryFailure] if reading or decoding fails.
+  Future<List<Entry>> fetchEntries({
+    required DateTime from,
+    required DateTime to,
+  }) async {
+    try {
+      final fromDay = _dayOf(from);
+      final toDay = _dayOf(to);
+      final rows = await _database.fetchEntriesBetween(fromDay, toDay);
+      if (rows.isEmpty) return const [];
+
+      final metrics = await _metricsById();
+      final valuesByEntry = <String, List<EntryValueRow>>{};
+      for (final valueRow in await _database.fetchValuesBetween(
+        fromDay,
+        toDay,
+      )) {
+        (valuesByEntry[valueRow.entryId] ??= []).add(valueRow);
+      }
+
+      return [
+        for (final row in rows)
+          _toEntry(row, valuesByEntry[row.id] ?? const [], metrics),
+      ];
+    } on Object catch (error, stackTrace) {
+      Error.throwWithStackTrace(FetchEntryFailure(error), stackTrace);
+    }
+  }
+
+  Future<Map<String, MetricRow>> _metricsById() async {
+    return {
+      for (final metric in await _database.fetchAllMetrics()) metric.id: metric,
+    };
+  }
+
+  static Entry _toEntry(
+    EntryRow row,
+    List<EntryValueRow> valueRows,
+    Map<String, MetricRow> metrics,
+  ) {
+    final values = <String, MetricValue>{};
+    for (final valueRow in valueRows) {
+      final metric = metrics[valueRow.metricId]!;
+      values[metric.key] = _toValue(metric, valueRow);
+    }
+    return Entry(
+      date: DateTime.parse(row.date),
+      values: values,
+      note: row.note,
+    );
+  }
+
   /// Saves [entry] as the whole log of its day.
   ///
   /// Values the day had before and [entry] leaves out are removed. A blank note

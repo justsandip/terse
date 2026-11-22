@@ -68,6 +68,33 @@ class LocalDatabase extends _$LocalDatabase {
     return query.getSingleOrNull();
   }
 
+  /// Returns the entries from [from] to [to] (both `YYYY-MM-DD`, both
+  /// included), oldest first. Deleted entries are left out.
+  Future<List<EntryRow>> fetchEntriesBetween(String from, String to) {
+    final query = select(entries)
+      ..where(
+        (entry) =>
+            entry.date.isBetweenValues(from, to) & entry.deletedAt.isNull(),
+      )
+      ..orderBy([(entry) => OrderingTerm.asc(entry.date)]);
+    return query.get();
+  }
+
+  /// Returns the values of the entries that [fetchEntriesBetween] returns for
+  /// [from] and [to], in no particular order.
+  ///
+  /// It joins on the entries instead of listing their ids, so a long range
+  /// does not hit the limit SQLite puts on the variables of one query.
+  Future<List<EntryValueRow>> fetchValuesBetween(String from, String to) {
+    final query =
+        select(entryValues).join([
+          innerJoin(entries, entries.id.equalsExp(entryValues.entryId)),
+        ])..where(
+          entries.date.isBetweenValues(from, to) & entries.deletedAt.isNull(),
+        );
+    return query.map((row) => row.readTable(entryValues)).get();
+  }
+
   /// Returns the values saved for the entry with [entryId].
   Future<List<EntryValueRow>> fetchEntryValues(String entryId) {
     final query = select(entryValues)

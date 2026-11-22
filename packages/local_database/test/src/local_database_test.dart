@@ -209,6 +209,104 @@ void main() {
         });
       });
 
+      group('fetchEntriesBetween', () {
+        test('returns nothing when there are no entries', () async {
+          expect(
+            await database.fetchEntriesBetween('2026-11-01', '2026-11-30'),
+            isEmpty,
+          );
+        });
+
+        test(
+          'returns the days in range, both ends included, oldest first',
+          () async {
+            await database.saveEntry(entry(id: 'c', date: '2026-11-18'), []);
+            await database.saveEntry(entry(id: 'a', date: '2026-11-16'), []);
+            await database.saveEntry(entry(id: 'b', date: '2026-11-17'), []);
+            await database.saveEntry(entry(id: 'x', date: '2026-11-15'), []);
+            await database.saveEntry(entry(id: 'y', date: '2026-11-19'), []);
+
+            final rows = await database.fetchEntriesBetween(
+              '2026-11-16',
+              '2026-11-18',
+            );
+
+            expect(rows.map((row) => row.id), equals(['a', 'b', 'c']));
+          },
+        );
+
+        test('leaves out a deleted entry', () async {
+          await database.saveEntry(entry(id: 'a', date: '2026-11-16'), []);
+          await database.saveEntry(
+            entry(id: 'b', date: '2026-11-17', deletedAt: now),
+            [],
+          );
+
+          final rows = await database.fetchEntriesBetween(
+            '2026-11-16',
+            '2026-11-18',
+          );
+
+          expect(rows.map((row) => row.id), equals(['a']));
+        });
+
+        test('returns nothing when the range is backwards', () async {
+          await database.saveEntry(entry(id: 'a', date: '2026-11-17'), []);
+
+          expect(
+            await database.fetchEntriesBetween('2026-11-18', '2026-11-16'),
+            isEmpty,
+          );
+        });
+      });
+
+      group('fetchValuesBetween', () {
+        test('returns the values of the entries in range only', () async {
+          await database.saveEntry(entry(id: 'a', date: '2026-11-16'), [
+            value(entryId: 'a', metricId: 'mood', numberValue: 4),
+            value(entryId: 'a', metricId: 'exercise', textValue: 'walk'),
+          ]);
+          await database.saveEntry(entry(id: 'b', date: '2026-11-17'), [
+            value(entryId: 'b', metricId: 'mood', numberValue: 2),
+          ]);
+          await database.saveEntry(entry(id: 'c', date: '2026-11-25'), [
+            value(entryId: 'c', metricId: 'mood', numberValue: 5),
+          ]);
+
+          final rows = await database.fetchValuesBetween(
+            '2026-11-16',
+            '2026-11-17',
+          );
+
+          expect(
+            rows.map((row) => (row.entryId, row.metricId)),
+            unorderedEquals([('a', 'mood'), ('a', 'exercise'), ('b', 'mood')]),
+          );
+        });
+
+        test('leaves out the values of a deleted entry', () async {
+          await database.saveEntry(entry(id: 'a', date: '2026-11-16'), [
+            value(entryId: 'a', metricId: 'mood', numberValue: 4),
+          ]);
+          await database.saveEntry(
+            entry(id: 'a', date: '2026-11-16', deletedAt: now),
+            [value(entryId: 'a', metricId: 'mood', numberValue: 4)],
+          );
+
+          expect(
+            await database.fetchValuesBetween('2026-11-16', '2026-11-16'),
+            isEmpty,
+          );
+        });
+
+        test('returns nothing when there are no entries', () async {
+          expect(
+            await database.fetchValuesBetween('2026-11-01', '2026-11-30'),
+            isEmpty,
+          );
+        });
+      });
+
       group('saveEntry', () {
         test('saves an entry with its values', () async {
           await database.saveEntry(entry(id: 'a'), [
