@@ -11,6 +11,7 @@ void main() {
     const metrics = [sleep, mood, exercise];
 
     final today = DateTime(2026, 11, 19);
+    final yesterday = DateTime(2026, 11, 18);
     final morning = DateTime(2026, 11, 19, 8);
 
     CaptureState ready({
@@ -38,6 +39,7 @@ void main() {
 
       expect(state.status, equals(CaptureStatus.loading));
       expect(state.date, isNull);
+      expect(state.isToday, isTrue);
       expect(state.metrics, isEmpty);
       expect(state.note, isEmpty);
       expect(state.canSave, isFalse);
@@ -83,6 +85,13 @@ void main() {
       final state = ready(note: 'a', fromYesterday: const {'mood'});
 
       expect(state.copyWith(), equals(state));
+      expect(
+        CaptureState(
+          date: yesterday,
+          isToday: false,
+        ).copyWith(note: 'a').isToday,
+        isFalse,
+      );
       expect(
         state.copyWith(
           status: CaptureStatus.saved,

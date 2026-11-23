@@ -5,7 +5,10 @@ import 'package:metrics_repository/metrics_repository.dart';
 import 'package:terse/capture/capture.dart';
 
 class CapturePage extends StatelessWidget {
-  const new({super.key});
+  const new({this.date, super.key});
+
+  /// The day to log. Today when `null`.
+  final DateTime? date;
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +16,7 @@ class CapturePage extends StatelessWidget {
       create: (context) => CaptureBloc(
         metricsRepository: context.read<MetricsRepository>(),
         entriesRepository: context.read<EntriesRepository>(),
+        date: date,
       )..add(const CaptureStarted()),
       child: const CaptureView(),
     );

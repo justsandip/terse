@@ -30,6 +30,7 @@ void main() {
       MetricValue? value,
       MetricValue? suggestion,
       bool fromYesterday = false,
+      bool isToday = true,
     }) {
       return tester.pumpApp(
         BlocProvider.value(
@@ -40,11 +41,25 @@ void main() {
               value: value,
               suggestion: suggestion,
               fromYesterday: fromYesterday,
+              isToday: isToday,
             ),
           ),
         ),
       );
     }
+
+    testWidgets('captions a faded value from the day before', (tester) async {
+      await pumpRow(
+        tester,
+        metric: MetricCatalog.sleepHours,
+        suggestion: const NumberValue(7),
+        fromYesterday: true,
+        isToday: false,
+      );
+
+      expect(find.text('Day before: 7 h'), findsOneWidget);
+      expect(find.textContaining('Yesterday'), findsNothing);
+    });
 
     testWidgets('captions a faded value from yesterday', (tester) async {
       await pumpRow(

@@ -145,6 +145,109 @@
   "@captureTitle": {
     "description": "Title of the capture screen"
   },
+  "captureTitleOther": "How was that day?",
+  "@captureTitleOther": {
+    "description": "Title of the capture screen for a day that is not today"
+  },
+  "captureSameAsDayBefore": "Same as the day before · {count, plural, =1{1 habit} other{{count} habits}}",
+  "@captureSameAsDayBefore": {
+    "description": "Button that confirms every suggested habit that came from the day before, on a day that is not today",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "captureDayBefore": "Day before: {value}",
+  "@captureDayBefore": {
+    "description": "Caption of a metric whose faded value is the day before, on a day that is not today",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "captureSaveDay": "Save day ({saved} of {total})",
+  "@captureSaveDay": {
+    "description": "Label of the save button on a day that is not today, with how many metrics are set",
+    "placeholders": {
+      "saved": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "captureEditDay": "Edit day",
+  "@captureEditDay": {
+    "description": "Button that reopens a saved day that is not today for editing"
+  },
+  "entryTrackedCount": "{tracked} of {total} tracked",
+  "@entryTrackedCount": {
+    "description": "How many metrics have a value on the day shown",
+    "placeholders": {
+      "tracked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "entryNotTracked": "Not tracked",
+  "@entryNotTracked": {
+    "description": "Shown for a metric that has no value on the day shown"
+  },
+  "entryNoteLabel": "NOTE",
+  "@entryNoteLabel": {
+    "description": "Heading above the note of a day"
+  },
+  "entryEdit": "Edit entry",
+  "@entryEdit": {
+    "description": "Button that opens a day for editing"
+  },
+  "entryDelete": "Delete entry",
+  "@entryDelete": {
+    "description": "Button that deletes a day"
+  },
+  "entryDeleteTitle": "Delete this entry?",
+  "@entryDeleteTitle": {
+    "description": "Title of the dialog that confirms deleting a day"
+  },
+  "entryDeleteBody": "{date} and its note will be removed. This cannot be undone.",
+  "@entryDeleteBody": {
+    "description": "Body of the dialog that confirms deleting a day",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "entryDeleteKeep": "Keep it",
+  "@entryDeleteKeep": {
+    "description": "Button that cancels deleting a day"
+  },
+  "entryDeleteConfirm": "Delete",
+  "@entryDeleteConfirm": {
+    "description": "Button that confirms deleting a day"
+  },
+  "entryDeleteFailed": "Could not delete this entry. Try again.",
+  "@entryDeleteFailed": {
+    "description": "Shown when deleting a day fails"
+  },
+  "entryLoadFailed": "Could not load this entry.",
+  "@entryLoadFailed": {
+    "description": "Shown when loading a day fails"
+  },
+  "entryRetry": "Try again",
+  "@entryRetry": {
+    "description": "Label of the button that retries loading a day"
+  },
+  "entryGone": "This entry no longer exists.",
+  "@entryGone": {
+    "description": "Shown when the day has no entry, for instance after it was deleted"
+  },
   "captureHelpTooltip": "How Today works",
   "@captureHelpTooltip": {
     "description": "Tooltip of the button that opens the help sheet"
@@ -201,11 +304,11 @@
       }
     }
   },
-  "captureSaveFailed": "Could not save today. Try again.",
+  "captureSaveFailed": "Could not save this day. Try again.",
   "@captureSaveFailed": {
     "description": "Shown when saving the day fails"
   },
-  "captureLoadFailed": "Could not load today.",
+  "captureLoadFailed": "Could not load this day.",
   "@captureLoadFailed": {
     "description": "Shown when loading the capture screen fails"
   },

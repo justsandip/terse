@@ -15,6 +15,7 @@ class MetricRow extends StatelessWidget {
     required this.value,
     required this.suggestion,
     required this.fromYesterday,
+    this.isToday = true,
     super.key,
   });
 
@@ -28,6 +29,10 @@ class MetricRow extends StatelessWidget {
 
   /// Whether [suggestion] is yesterday's value, not a start value.
   final bool fromYesterday;
+
+  /// Whether the day being logged is today. For any other day [suggestion]
+  /// comes from the day before, not from yesterday.
+  final bool isToday;
 
   @override
   Widget build(BuildContext context) {
@@ -45,9 +50,11 @@ class MetricRow extends StatelessWidget {
         Text(metric.label(l10n), style: theme.textTheme.titleSmall),
         if (faded != null)
           Text(
-            fromYesterday
+            !fromYesterday
+                ? l10n.captureSuggested(metric.describeValue(l10n, faded))
+                : isToday
                 ? l10n.captureYesterday(metric.describeValue(l10n, faded))
-                : l10n.captureSuggested(metric.describeValue(l10n, faded)),
+                : l10n.captureDayBefore(metric.describeValue(l10n, faded)),
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),

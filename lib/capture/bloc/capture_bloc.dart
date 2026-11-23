@@ -10,6 +10,7 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
   new({
     required this._metricsRepository,
     required this._entriesRepository,
+    this._date,
     this._now = DateTime.now,
   }) : super(const CaptureState()) {
     on<CaptureStarted>(_onStarted);
@@ -23,6 +24,10 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
 
   final MetricsRepository _metricsRepository;
   final EntriesRepository _entriesRepository;
+
+  /// The day to log. Today when `null`. Only the calendar day counts, and it
+  /// is up to the caller not to pass a day after today.
+  final DateTime? _date;
   final DateTime Function() _now;
 
   Future<void> _onStarted(
@@ -33,10 +38,14 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
     try {
       final now = _now();
       final today = DateTime(now.year, now.month, now.day);
+      final requested = _date;
+      final day = requested == null
+          ? today
+          : DateTime(requested.year, requested.month, requested.day);
       final metrics = await _metricsRepository.fetchMetrics();
-      final entry = await _entriesRepository.fetchEntry(today);
+      final entry = await _entriesRepository.fetchEntry(day);
       final yesterday = await _entriesRepository.fetchEntry(
-        DateTime(today.year, today.month, today.day - 1),
+        DateTime(day.year, day.month, day.day - 1),
       );
 
       final saved = entry?.values ?? const <String, MetricValue>{};
@@ -60,7 +69,8 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
       emit(
         CaptureState(
           status: CaptureStatus.ready,
-          date: today,
+          date: day,
+          isToday: day == today,
           metrics: metrics,
           suggestions: suggestions,
           suggestedFromYesterday: fromYesterday,
@@ -130,7 +140,11 @@ class CaptureBloc extends Bloc<CaptureEvent, CaptureState> {
       emit(
         state.copyWith(
           status: CaptureStatus.saved,
-          elapsed: startedAt == null ? null : _now().difference(startedAt),
+          // How long logging took only means something for today. A day
+          // filled in afterwards was not logged in the moment.
+          elapsed: startedAt == null || !state.isToday
+              ? null
+              : _now().difference(startedAt),
         ),
       );
     } on EntriesFailure catch (error, stackTrace) {

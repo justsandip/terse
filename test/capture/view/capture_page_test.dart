@@ -45,5 +45,22 @@ void main() {
       expect(find.text('Mood'), findsOneWidget);
       verify(() => metricsRepository.fetchMetrics()).called(1);
     });
+
+    testWidgets('loads the given day instead of today', (tester) async {
+      await tester.pumpApp(
+        MultiRepositoryProvider(
+          providers: [
+            RepositoryProvider.value(value: metricsRepository),
+            RepositoryProvider.value(value: entriesRepository),
+          ],
+          child: CapturePage(date: DateTime(2026, 11, 10)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('How was that day?'), findsOneWidget);
+      verify(() => entriesRepository.fetchEntry(DateTime(2026, 11, 10)))
+          .called(1);
+    });
   });
 }

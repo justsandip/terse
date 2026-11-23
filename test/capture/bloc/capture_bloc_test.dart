@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:entries_repository/entries_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -39,9 +41,10 @@ void main() {
     when(() => entriesRepository.saveEntry(any())).thenAnswer((_) async {});
   });
 
-  CaptureBloc buildBloc() => CaptureBloc(
+  CaptureBloc buildBloc({DateTime? date}) => CaptureBloc(
     metricsRepository: metricsRepository,
     entriesRepository: entriesRepository,
+    date: date,
     now: () => clock,
   );
 
@@ -76,7 +79,7 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(const CaptureStarted()),
         expect: () => [
-          const CaptureState(),
+          CaptureState(),
           ready(suggestions: const {'sleep_hours': NumberValue(7)}),
         ],
       );
@@ -98,7 +101,7 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(const CaptureStarted()),
         expect: () => [
-          const CaptureState(),
+          CaptureState(),
           ready(
             suggestions: const {
               'sleep_hours': NumberValue(6.5),
@@ -133,13 +136,63 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(const CaptureStarted()),
         expect: () => [
-          const CaptureState(),
+          CaptureState(),
           ready(
             suggestions: const {'mood': NumberValue(2)},
             fromYesterday: const {'mood'},
             confirmed: const {'sleep_hours': NumberValue(8)},
             note: 'slept well',
           ),
+        ],
+      );
+
+      blocTest<CaptureBloc, CaptureState>(
+        'logs the given day, and suggests from the day before it',
+        setUp: () {
+          when(() => entriesRepository.fetchEntry(DateTime(2026, 11, 10)))
+              .thenAnswer(
+                (_) async => Entry(
+                  date: DateTime(2026, 11, 10),
+                  values: const {'mood': NumberValue(5)},
+                  note: 'a long day',
+                ),
+              );
+          when(() => entriesRepository.fetchEntry(DateTime(2026, 11, 9)))
+              .thenAnswer(
+                (_) async => Entry(
+                  date: DateTime(2026, 11, 9),
+                  values: const {'sleep_hours': NumberValue(6)},
+                ),
+              );
+        },
+        // Only the calendar day counts, not the time of day.
+        build: () => buildBloc(date: DateTime(2026, 11, 10, 22, 30)),
+        act: (bloc) => bloc.add(const CaptureStarted()),
+        expect: () => [
+          CaptureState(),
+          CaptureState(
+            status: CaptureStatus.ready,
+            date: DateTime(2026, 11, 10),
+            isToday: false,
+            metrics: metrics,
+            suggestions: const {'sleep_hours': NumberValue(6)},
+            suggestedFromYesterday: const {'sleep_hours'},
+            confirmed: const {'mood': NumberValue(5)},
+            note: 'a long day',
+          ),
+        ],
+        verify: (_) {
+          verifyNever(() => entriesRepository.fetchEntry(today));
+        },
+      );
+
+      blocTest<CaptureBloc, CaptureState>(
+        'treats the given day as today when it is today',
+        build: () => buildBloc(date: DateTime(2026, 11, 19, 23)),
+        act: (bloc) => bloc.add(const CaptureStarted()),
+        expect: () => [
+          CaptureState(),
+          ready(suggestions: const {'sleep_hours': NumberValue(7)}),
         ],
       );
 
@@ -152,7 +205,7 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(const CaptureStarted()),
         expect: () => [
-          const CaptureState(),
+          CaptureState(),
           const CaptureState(status: CaptureStatus.loadFailure),
         ],
         errors: () => [isA<FetchMetricsFailure>()],
@@ -167,7 +220,7 @@ void main() {
         build: buildBloc,
         act: (bloc) => bloc.add(const CaptureStarted()),
         expect: () => [
-          const CaptureState(),
+          CaptureState(),
           const CaptureState(status: CaptureStatus.loadFailure),
         ],
         errors: () => [isA<FetchEntryFailure>()],
@@ -321,6 +374,44 @@ void main() {
     });
 
     group('CaptureSubmitted', () {
+      blocTest<CaptureBloc, CaptureState>(
+        'saves a day that is not today under its own date, without a time',
+        build: buildBloc,
+        seed: () => CaptureState(
+          status: CaptureStatus.ready,
+          date: yesterday,
+          isToday: false,
+          metrics: metrics,
+          confirmed: const {'mood': NumberValue(3)},
+          startedAt: morning,
+        ),
+        act: (bloc) {
+          clock = morning.add(const Duration(seconds: 14));
+          bloc.add(const CaptureSubmitted());
+        },
+        expect: () => [
+          isA<CaptureState>().having(
+            (state) => state.status,
+            'status',
+            CaptureStatus.saving,
+          ),
+          isA<CaptureState>()
+              .having((state) => state.status, 'status', CaptureStatus.saved)
+              .having((state) => state.elapsed, 'elapsed', isNull),
+        ],
+        verify: (_) {
+          verify(
+            () => entriesRepository.saveEntry(
+              Entry(
+                date: yesterday,
+                values: const {'mood': NumberValue(3)},
+                note: '',
+              ),
+            ),
+          ).called(1);
+        },
+      );
+
       blocTest<CaptureBloc, CaptureState>(
         'saves only the confirmed values and times the logging',
         build: buildBloc,
