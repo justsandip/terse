@@ -23,6 +23,7 @@ void main() {
 
     CaptureState state({
       CaptureStatus status = CaptureStatus.ready,
+      bool isToday = true,
       Map<String, MetricValue> suggestions = const {},
       Set<String> fromYesterday = const {},
       Map<String, MetricValue> confirmed = const {},
@@ -33,6 +34,7 @@ void main() {
         status: status,
         date: today,
         metrics: metrics,
+        isToday: isToday,
         suggestions: suggestions,
         suggestedFromYesterday: fromYesterday,
         confirmed: confirmed,
@@ -74,8 +76,7 @@ void main() {
         const CaptureState(status: CaptureStatus.loadFailure),
       );
 
-      expect(find.text('Could not load today.'), findsOneWidget);
-
+      expect(find.text('Could not load this day.'), findsOneWidget);
       await tester.tap(find.text('Try again'));
 
       verify(() => bloc.add(const CaptureStarted())).called(1);
@@ -132,7 +133,7 @@ void main() {
         ),
       );
 
-      expect(find.text('Could not save today. Try again.'), findsOneWidget);
+      expect(find.text('Could not save this day. Try again.'), findsOneWidget);
     });
 
     testWidgets('confirms habits from yesterday in one tap', (tester) async {
@@ -145,6 +146,25 @@ void main() {
       );
 
       await tester.tap(find.text('Same as yesterday · 1 habit'));
+
+      verify(() => bloc.add(const CaptureHabitsConfirmed())).called(1);
+    });
+
+    testWidgets('offers to confirm the day before on a day that is not today', (
+      tester,
+    ) async {
+      await pumpView(
+        tester,
+        state(
+          isToday: false,
+          suggestions: const {'sleep_hours': NumberValue(7)},
+          fromYesterday: const {'sleep_hours'},
+        ),
+      );
+
+      expect(find.text('Same as the day before · 1 habit'), findsOneWidget);
+
+      await tester.tap(find.text('Same as the day before · 1 habit'));
 
       verify(() => bloc.add(const CaptureHabitsConfirmed())).called(1);
     });

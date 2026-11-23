@@ -16,7 +16,13 @@ enum AppRoute {
   history('/history'),
 
   /// The setup screen.
-  setup('/setup');
+  setup('/setup'),
+
+  /// What was logged on one day. The day is written `yyyy-MM-dd`.
+  entry('/entries/:date'),
+
+  /// Logging a day other than today, from its entry.
+  entryEdit('/entries/:date/edit');
 
   /// {@macro app_route}
   new(this.path);

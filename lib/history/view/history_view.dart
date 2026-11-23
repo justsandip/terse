@@ -12,8 +12,8 @@ import 'package:terse/theme/theme.dart';
 class HistoryView extends StatelessWidget {
   const new({this.onDayTap, super.key});
 
-  /// Called with the day of an entry the user taps. The entry screen is not
-  /// built yet, so the page leaves it empty and entries cannot be opened.
+  /// Called with the day of an entry the user taps. Entries cannot be opened
+  /// when it is `null`.
   final ValueChanged<DateTime>? onDayTap;
 
   @override

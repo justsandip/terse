@@ -12,6 +12,8 @@ class CaptureView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Only a day opened from its entry can go back. Today is a tab.
+      appBar: Navigator.of(context).canPop() ? AppBar() : null,
       body: SafeArea(
         child: BlocBuilder<CaptureBloc, CaptureState>(
           builder: (context, state) {
@@ -68,13 +70,15 @@ class _Form extends StatelessWidget {
                           isScrollControlled: true,
                           builder: (context) => const CaptureHelpSheet(),
                         ),
-
                         tooltip: l10n.captureHelpTooltip,
                         icon: const Icon(Icons.help_outline),
                       ),
                     ],
                   ),
-                  Text(l10n.captureTitle, style: theme.textTheme.displayMedium),
+                  Text(
+                    state.isToday ? l10n.captureTitle : l10n.captureTitleOther,
+                    style: theme.textTheme.displayMedium,
+                  ),
                   const SizedBox(height: TerseSpacing.md),
                   if (state.isEditable && state.habitsToConfirm.isNotEmpty)
                     _HabitsButton(state: state),
@@ -92,6 +96,7 @@ class _Form extends StatelessWidget {
                             suggestion: state.suggestions[metric.key],
                             fromYesterday: state.suggestedFromYesterday
                                 .contains(metric.key),
+                            isToday: state.isToday,
                           ),
                         ],
                         const SizedBox(height: TerseSpacing.sm),
@@ -148,10 +153,15 @@ class _Form extends StatelessWidget {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : Text(
-                        l10n.captureSave(
-                          state.confirmed.length,
-                          state.metrics.length,
-                        ),
+                        state.isToday
+                            ? l10n.captureSave(
+                                state.confirmed.length,
+                                state.metrics.length,
+                              )
+                            : l10n.captureSaveDay(
+                                state.confirmed.length,
+                                state.metrics.length,
+                              ),
                       ),
               ),
             ),
@@ -182,7 +192,9 @@ class _HabitsButton extends StatelessWidget {
               context.read<CaptureBloc>().add(const CaptureHabitsConfirmed()),
           child: Text(
             fromYesterday
-                ? l10n.captureSameAsYesterday(habits.length)
+                ? state.isToday
+                      ? l10n.captureSameAsYesterday(habits.length)
+                      : l10n.captureSameAsDayBefore(habits.length)
                 : l10n.captureUseSuggestions(habits.length),
           ),
         ),
@@ -259,7 +271,9 @@ class _Saved extends StatelessWidget {
           TextButton(
             onPressed: () =>
                 context.read<CaptureBloc>().add(const CaptureEditRequested()),
-            child: Text(l10n.captureEditToday),
+            child: Text(
+              state.isToday ? l10n.captureEditToday : l10n.captureEditDay,
+            ),
           ),
         ],
       ),

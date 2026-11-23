@@ -26,6 +26,7 @@ final class CaptureState extends Equatable {
     this.status = CaptureStatus.loading,
     this.date,
     this.metrics = const [],
+    this.isToday = true,
     this.suggestions = const {},
     this.suggestedFromYesterday = const {},
     this.confirmed = const {},
@@ -41,6 +42,10 @@ final class CaptureState extends Equatable {
 
   /// The metrics the user tracks, in their order.
   final List<MetricDefinition> metrics;
+
+  /// Whether [date] is today. Other days are reached from History, so the
+  /// screen words itself without "today" and "yesterday".
+  final bool isToday;
 
   /// What the screen shows faded: yesterday's value, or the metric's start
   /// value when there is no history. Not saved until the user confirms it.
@@ -82,6 +87,7 @@ final class CaptureState extends Equatable {
     CaptureStatus? status,
     DateTime? date,
     List<MetricDefinition>? metrics,
+    bool? isToday,
     Map<String, MetricValue>? suggestions,
     Map<String, MetricValue>? confirmed,
     String? note,
@@ -92,6 +98,7 @@ final class CaptureState extends Equatable {
       status: status ?? this.status,
       date: date ?? this.date,
       metrics: metrics ?? this.metrics,
+      isToday: isToday ?? this.isToday,
       suggestions: suggestions ?? this.suggestions,
       suggestedFromYesterday: suggestedFromYesterday,
       confirmed: confirmed ?? this.confirmed,
@@ -106,6 +113,7 @@ final class CaptureState extends Equatable {
     status,
     date,
     metrics,
+    isToday,
     suggestions,
     suggestedFromYesterday,
     confirmed,
